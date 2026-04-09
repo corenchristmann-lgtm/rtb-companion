@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import type { ChecklistItem, Note } from "@/types/database";
 import { DEFAULT_CHECKLIST } from "@/lib/data";
 
@@ -11,7 +11,7 @@ export function useChecklist(challengeId: number) {
   const [loading, setLoading] = useState(true);
 
   const fetchItems = useCallback(async () => {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from("checklist_items")
       .select("*")
       .eq("challenge_id", challengeId)
@@ -26,11 +26,11 @@ export function useChecklist(challengeId: number) {
 
   const toggleItem = useCallback(async (itemId: number, checked: boolean) => {
     setItems(prev => prev.map(i => i.id === itemId ? { ...i, is_checked: checked } : i));
-    await supabase.from("checklist_items").update({ is_checked: checked }).eq("id", itemId);
+    await getSupabase().from("checklist_items").update({ is_checked: checked }).eq("id", itemId);
   }, []);
 
   const addItem = useCallback(async (label: string) => {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from("checklist_items")
       .insert({ challenge_id: challengeId, label, is_custom: true, is_checked: false })
       .select()
@@ -52,7 +52,7 @@ export function useNotes(projectId?: number, challengeId?: number) {
   const debounceRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
   const fetchNotes = useCallback(async () => {
-    let query = supabase.from("notes").select("*");
+    let query = getSupabase().from("notes").select("*");
     if (projectId) query = query.eq("project_id", projectId);
     if (challengeId) query = query.eq("challenge_id", challengeId);
     const { data } = await query.order("id");
@@ -99,7 +99,7 @@ export function useNotes(projectId?: number, challengeId?: number) {
     const key = `${pId}-${cId}`;
     if (debounceRef.current[key]) clearTimeout(debounceRef.current[key]);
     debounceRef.current[key] = setTimeout(async () => {
-      await supabase.from("notes").upsert(
+      await getSupabase().from("notes").upsert(
         {
           project_id: pId,
           challenge_id: cId,
@@ -120,7 +120,7 @@ export function useAllChecklistProgress() {
 
   useEffect(() => {
     async function fetch() {
-      const { data } = await supabase.from("checklist_items").select("challenge_id, is_checked");
+      const { data } = await getSupabase().from("checklist_items").select("challenge_id, is_checked");
       if (!data) return;
       const map: Record<number, { checked: number; total: number }> = {};
       for (const item of data as { challenge_id: number; is_checked: boolean }[]) {
@@ -138,7 +138,7 @@ export function useAllChecklistProgress() {
 
 // ---- Initialize checklist items if empty ----
 export async function initializeChecklistIfEmpty() {
-  const { data, error } = await supabase.from("checklist_items").select("id").limit(1);
+  const { data, error } = await getSupabase().from("checklist_items").select("id").limit(1);
   if (error || (data && data.length > 0)) return;
 
   const items: { challenge_id: number; label: string; is_checked: boolean; is_custom: boolean }[] = [];
@@ -152,5 +152,5 @@ export async function initializeChecklistIfEmpty() {
       });
     }
   }
-  await supabase.from("checklist_items").insert(items);
+  await getSupabase().from("checklist_items").insert(items);
 }
