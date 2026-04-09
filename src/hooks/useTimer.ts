@@ -95,7 +95,7 @@ export function useTimer() {
         if (nowSec < startSec) {
           status = "in_transit";
           remainingSeconds = startSec - nowSec;
-          label = `D\u00e9part dans ${formatTime(remainingSeconds)}`;
+          label = `Départ dans ${formatTime(remainingSeconds)}`;
         } else if (nowSec < endSec) {
           status = "active";
           remainingSeconds = endSec - nowSec;
@@ -105,7 +105,7 @@ export function useTimer() {
           status = "completed";
           remainingSeconds = 0;
           progressPercent = 100;
-          label = "Termin\u00e9";
+          label = "Terminé";
         }
       } else {
         // Auto-detect based on current time
@@ -120,7 +120,7 @@ export function useTimer() {
             idx = i;
             status = "in_transit";
             remainingSeconds = startSec - nowSec;
-            label = `D\u00e9but dans ${formatTime(remainingSeconds)}`;
+            label = `Début dans ${formatTime(remainingSeconds)}`;
             found = true;
 
             // Alert 5 min before start
@@ -156,13 +156,13 @@ export function useTimer() {
           if (nowSec >= timeToSeconds(CHALLENGES[CHALLENGES.length - 1].end_time)) {
             idx = CHALLENGES.length - 1;
             status = "completed";
-            label = "Journ\u00e9e termin\u00e9e !";
+            label = "Journée terminée !";
             progressPercent = 100;
           } else {
             idx = 0;
             status = "upcoming";
             remainingSeconds = timeToSeconds(CHALLENGES[0].start_time) - nowSec;
-            label = `D\u00e9but dans ${formatTime(remainingSeconds)}`;
+            label = `Début dans ${formatTime(remainingSeconds)}`;
           }
         }
       }

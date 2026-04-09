@@ -2,18 +2,18 @@
 
 import type { ChallengeStatusType } from "@/types/database";
 
-const config: Record<ChallengeStatusType, { label: string; className: string }> = {
-  upcoming: { label: "\u00c0 VENIR", className: "bg-muted text-muted-foreground" },
-  in_transit: { label: "EN TRANSIT", className: "bg-yellow-500/20 text-yellow-400" },
-  active: { label: "EN COURS", className: "bg-primary/20 text-primary" },
-  completed: { label: "TERMIN\u00c9", className: "bg-green-500/20 text-green-400" },
+const styles: Record<ChallengeStatusType, { label: string; cls: string }> = {
+  upcoming:   { label: "À venir",    cls: "bg-muted text-muted-foreground" },
+  in_transit: { label: "En transit", cls: "bg-amber-500/15 text-amber-400" },
+  active:     { label: "En cours",   cls: "bg-primary/15 text-primary" },
+  completed:  { label: "Terminé",    cls: "bg-emerald-500/15 text-emerald-400" },
 };
 
 export function StatusBadge({ status }: { status: ChallengeStatusType }) {
-  const c = config[status];
+  const s = styles[status];
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${c.className}`}>
-      {c.label}
+    <span className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wide ${s.cls}`}>
+      {s.label}
     </span>
   );
 }

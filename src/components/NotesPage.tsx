@@ -3,98 +3,86 @@
 import { useState } from "react";
 import { CHALLENGES, PROJECTS } from "@/lib/data";
 import { useNotes } from "@/hooks/useSupabase";
-import { NoteForm } from "@/components/NoteForm";
+import { NoteForm } from "./NoteForm";
 
-type ViewMode = "by-project" | "by-challenge";
+type View = "project" | "challenge";
 
 export function NotesPage() {
-  const [view, setView] = useState<ViewMode>("by-project");
+  const [view, setView] = useState<View>("challenge");
   const { notes, upsertNote } = useNotes();
 
   return (
-    <div className="p-4 max-w-lg mx-auto">
-      <div className="flex items-center justify-between pt-2 mb-4">
-        <h1 className="font-heading text-2xl">Notes</h1>
+    <div className="px-4 py-5 max-w-lg mx-auto">
+      {/* Header + toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-lg font-bold tracking-tight">Notes</h1>
         <div className="flex bg-secondary rounded-xl p-0.5">
           <button
-            onClick={() => setView("by-project")}
-            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-              view === "by-project" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+            onClick={() => setView("challenge")}
+            className={`px-3 py-1.5 text-[11px] font-medium rounded-lg transition-colors ${
+              view === "challenge" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+            }`}
+          >
+            Par défi
+          </button>
+          <button
+            onClick={() => setView("project")}
+            className={`px-3 py-1.5 text-[11px] font-medium rounded-lg transition-colors ${
+              view === "project" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
             Par projet
           </button>
-          <button
-            onClick={() => setView("by-challenge")}
-            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-              view === "by-challenge" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-            }`}
-          >
-            Par challenge
-          </button>
         </div>
       </div>
 
-      {view === "by-project" ? (
+      {view === "challenge" ? (
         <div className="space-y-6">
-          {PROJECTS.map((project) => (
-            <div key={project.id}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
-                  {project.name.charAt(0)}
-                </div>
-                <h2 className="text-base font-semibold">{project.name}</h2>
-                <span className="text-xs text-muted-foreground">{project.members}</span>
-              </div>
+          {CHALLENGES.map((ch) => (
+            <section key={ch.id}>
+              <h2 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                <span>{ch.emoji}</span>
+                <span>{ch.company}</span>
+                <span className="text-[11px] text-muted-foreground font-normal">{ch.start_time}</span>
+              </h2>
               <div className="space-y-2">
-                {CHALLENGES.map((ch) => {
-                  const note = notes.find(
-                    (n) => n.project_id === project.id && n.challenge_id === ch.id
-                  );
-                  const hasContent = note?.score || note?.free_notes;
-                  return (
-                    <NoteCompact
-                      key={ch.id}
-                      challengeLabel={`${ch.emoji} ${ch.company}`}
-                      note={note ?? null}
-                      hasContent={!!hasContent}
-                      projectId={project.id}
-                      challengeId={ch.id}
-                      onUpdate={upsertNote}
-                    />
-                  );
-                })}
+                {PROJECTS.map((p) => (
+                  <NoteForm
+                    key={p.id}
+                    project={p}
+                    challengeId={ch.id}
+                    note={notes.find((n) => n.project_id === p.id && n.challenge_id === ch.id) ?? null}
+                    onUpdate={upsertNote}
+                  />
+                ))}
               </div>
-            </div>
+            </section>
           ))}
         </div>
       ) : (
         <div className="space-y-6">
-          {CHALLENGES.map((ch) => (
-            <div key={ch.id}>
-              <h2 className="text-base font-semibold mb-3">
-                {ch.emoji} {ch.company}
-                <span className="text-xs text-muted-foreground font-normal ml-2">
-                  {ch.start_time}\u2013{ch.end_time}
-                </span>
+          {PROJECTS.map((p) => (
+            <section key={p.id}>
+              <h2 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">{p.name[0]}</div>
+                <span>{p.name}</span>
               </h2>
-              <div className="space-y-3">
-                {PROJECTS.map((project) => {
-                  const note = notes.find(
-                    (n) => n.project_id === project.id && n.challenge_id === ch.id
-                  );
+              <div className="space-y-2">
+                {CHALLENGES.map((ch) => {
+                  const note = notes.find((n) => n.project_id === p.id && n.challenge_id === ch.id);
                   return (
-                    <NoteForm
-                      key={project.id}
-                      project={project}
-                      challengeId={ch.id}
+                    <CompactNote
+                      key={ch.id}
+                      label={`${ch.emoji} ${ch.company}`}
                       note={note ?? null}
+                      projectId={p.id}
+                      challengeId={ch.id}
                       onUpdate={upsertNote}
                     />
                   );
                 })}
               </div>
-            </div>
+            </section>
           ))}
         </div>
       )}
@@ -102,81 +90,63 @@ export function NotesPage() {
   );
 }
 
-function NoteCompact({
-  challengeLabel,
-  note,
-  hasContent,
-  projectId,
-  challengeId,
-  onUpdate,
+function CompactNote({
+  label, note, projectId, challengeId, onUpdate,
 }: {
-  challengeLabel: string;
+  label: string;
   note: import("@/types/database").Note | null;
-  hasContent: boolean;
   projectId: number;
   challengeId: number;
   onUpdate: (pid: number, cid: number, u: Record<string, unknown>) => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [open, setOpen] = useState(false);
   const score = note?.score ?? 0;
+  const hasContent = !!(note?.score || note?.free_notes);
 
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden">
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
       <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 p-3 text-left min-h-[44px]"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-2.5 px-3 py-2.5 text-left min-h-[44px]"
       >
-        <span className="text-sm flex-1">{challengeLabel}</span>
+        <span className="text-sm flex-1">{label}</span>
         {score > 0 && (
-          <span className="text-xs text-primary font-semibold">
+          <span className="text-[11px] text-primary tabular-nums">
             {"★".repeat(score)}{"☆".repeat(5 - score)}
           </span>
         )}
         {!hasContent && (
-          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-            vide
-          </span>
+          <span className="text-[9px] text-muted-foreground/50 bg-secondary px-1.5 py-0.5 rounded">vide</span>
         )}
-        <span className={`text-muted-foreground transition-transform ${expanded ? "rotate-90" : ""}`}>
-          ›
-        </span>
+        <span className={`text-muted-foreground/30 text-xs transition-transform ${open ? "rotate-90" : ""}`}>›</span>
       </button>
-      {expanded && (
-        <div className="px-3 pb-3 space-y-2">
-          {/* Star rating */}
-          <div className="flex gap-1">
+
+      {open && (
+        <div className="px-3 pb-3 space-y-2 border-t border-border pt-2">
+          <div className="flex gap-0.5">
             {[1, 2, 3, 4, 5].map((s) => (
-              <button
-                key={s}
-                onClick={() => onUpdate(projectId, challengeId, { score: s === score ? null : s })}
-                className="min-w-[36px] min-h-[36px] flex items-center justify-center text-xl"
-              >
-                {s <= score ? "\u2B50" : "\u2606"}
+              <button key={s} onClick={() => onUpdate(projectId, challengeId, { score: s === score ? null : s })}
+                className="w-8 h-8 flex items-center justify-center text-base active:scale-90 transition-transform">
+                {s <= score ? "★" : "☆"}
               </button>
             ))}
           </div>
           <textarea
             value={note?.free_notes ?? ""}
             onChange={(e) => onUpdate(projectId, challengeId, { free_notes: e.target.value })}
-            placeholder="Notes..."
+            placeholder="Notes…"
             rows={2}
-            className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+            className="w-full px-2.5 py-1.5 bg-secondary rounded-lg text-xs leading-relaxed placeholder:text-muted-foreground/40 focus:outline-none resize-none"
           />
           <div className="grid grid-cols-2 gap-2">
-            <input
-              type="text"
-              value={note?.strength ?? ""}
+            <input type="text" value={note?.strength ?? ""}
               onChange={(e) => onUpdate(projectId, challengeId, { strength: e.target.value })}
-              placeholder="💪 Point fort"
-              className="h-9 px-2 bg-secondary/50 border border-border rounded-lg text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500/50"
-            />
-            <input
-              type="text"
-              value={note?.improvement ?? ""}
+              placeholder="Point fort"
+              className="h-7 px-2 bg-secondary rounded-md text-[11px] placeholder:text-muted-foreground/40 focus:outline-none" />
+            <input type="text" value={note?.improvement ?? ""}
               onChange={(e) => onUpdate(projectId, challengeId, { improvement: e.target.value })}
-              placeholder="📈 Amélioration"
-              className="h-9 px-2 bg-secondary/50 border border-border rounded-lg text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
-            />
+              placeholder="Amélioration"
+              className="h-7 px-2 bg-secondary rounded-md text-[11px] placeholder:text-muted-foreground/40 focus:outline-none" />
           </div>
         </div>
       )}

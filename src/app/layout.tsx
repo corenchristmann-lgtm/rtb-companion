@@ -1,14 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 
+const dmSans = DM_Sans({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-sans",
+});
+
 export const metadata: Metadata = {
-  title: "RTB Companion — Équipe 1",
-  description: "Road-to-Business companion app pour l'accompagnateur Équipe 1",
+  title: "RTB — Équipe 1",
+  description: "Road-to-Business companion",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "RTB Companion",
+    title: "RTB",
   },
 };
 
@@ -17,7 +23,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#0a0a1a",
+  themeColor: "#111118",
 };
 
 export default function RootLayout({
@@ -26,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="dark h-full antialiased">
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+    <html lang="fr" className={`${dmSans.variable} dark`}>
+      <body className="min-h-dvh bg-background text-foreground antialiased font-sans">
         {children}
       </body>
     </html>
