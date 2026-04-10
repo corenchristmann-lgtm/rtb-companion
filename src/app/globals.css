@@ -112,6 +112,24 @@
 }
 .animate-slide-up { animation: slide-up 0.2s ease-out; }
 
+@keyframes slide-left {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-left { animation: slide-left 0.2s ease-out; }
+
+@keyframes slide-right {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-right { animation: slide-right 0.2s ease-out; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in { animation: fade-in 0.15s ease-out; }
+
 ::-webkit-scrollbar { width: 0; height: 0; }
 
 .timer-display {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { CONTACTS } from "@/lib/teams";
 import type { Team } from "@/lib/teams";
@@ -25,16 +25,45 @@ interface Props {
   onLogout: () => void;
 }
 
+// (1) Google Maps link to a specific address
+function mapsLink(address: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+}
+
 export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }: Props) {
   const ch = challenges[timer.currentChallengeIndex];
   const [panel, setPanel] = useState<"none" | "tips" | "checklist">("none");
+  const [photos, setPhotos] = useState<Record<number, string[]>>({});
   if (!ch) return null;
 
   const isActive = timer.status === "active";
   const isTransit = timer.status === "in_transit";
   const isDone = timer.status === "completed";
   const urgent = isActive && timer.remainingSeconds <= 300;
+  // (3) Departure warning: show when <10 min left on active challenge
+  const departSoon = isActive && timer.remainingSeconds <= 600 && timer.remainingSeconds > 300;
   const togglePanel = (p: "tips" | "checklist") => setPanel(panel === p ? "none" : p);
+
+  // (8) Swipe handling
+  const touchStartX = useRef(0);
+  const handleTouchStart = useCallback((e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; }, []);
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 60) {
+      if (dx < 0) timer.goNext();
+      else timer.goPrev();
+    }
+  }, [timer]);
+
+  // (11) Photo capture
+  const fileRef = useRef<HTMLInputElement>(null);
+  const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setPhotos(prev => ({ ...prev, [ch.id]: [...(prev[ch.id] || []), url] }));
+    e.target.value = "";
+  };
 
   // Pre-event screen
   if (!timer.isEventDay && !timer.isManualOverride) {
@@ -84,20 +113,34 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
   }
 
   return (
-    <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-5">
+    <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-5"
+      onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+
+      {/* (3) Departure banner */}
+      {departSoon && (
+        <div className="rounded-xl bg-[#F46277] text-white px-4 py-3 text-center animate-slide-up">
+          <p className="text-sm font-bold">Préparez-vous à partir</p>
+          <p className="text-xs mt-0.5 opacity-80">Il reste {formatTime(timer.remainingSeconds)}</p>
+        </div>
+      )}
+      {urgent && (
+        <div className="rounded-xl bg-[#F46277] text-white px-4 py-3 text-center animate-breathe">
+          <p className="text-sm font-bold">Fin imminente — {formatTime(timer.remainingSeconds)}</p>
+        </div>
+      )}
+
       {/* Status bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className={`w-2.5 h-2.5 rounded-full ${
-            isActive ? (urgent ? "bg-[#F46277] animate-breathe" : "bg-[#7A4AED] animate-breathe") :
+            isActive ? "bg-[#7A4AED] animate-breathe" :
             isTransit ? "bg-amber-500" : isDone ? "bg-emerald-500" : "bg-gray-300"
           }`} />
           <span className={`text-[11px] font-bold uppercase tracking-widest ${
-            isActive ? (urgent ? "text-[#F46277]" : "text-[#7A4AED]") :
+            isActive ? "text-[#7A4AED]" :
             isTransit ? "text-amber-600" : isDone ? "text-emerald-600" : "text-gray-400"
           }`}>
-            {isActive ? (urgent ? "Fin imminente" : "En cours") :
-             isTransit ? "En transit" : isDone ? "Terminé" : "À venir"}
+            {isActive ? "En cours" : isTransit ? "En transit" : isDone ? "Terminé" : "À venir"}
           </span>
           <span className="text-[10px] text-[#7C6FA0]">· {team.name}</span>
         </div>
@@ -126,14 +169,18 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
       </div>
 
       {/* Challenge card */}
-      <div onClick={() => onOpenChallenge(ch.id)}
-        className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm cursor-pointer active:scale-[0.98] transition-transform">
+      <div className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm">
         <div className="flex items-start gap-3">
           <CompanyLogo src={ch.emoji ?? ""} company={ch.company} size={44} />
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-[#7C6FA0] mb-0.5">Challenge {ch.position}/8</p>
             <p className="text-base font-bold leading-tight text-[#1A1035]">{ch.company}</p>
-            <p className="text-xs text-[#7C6FA0] mt-1">{ch.start_time} – {ch.end_time} · {ch.location}</p>
+            <p className="text-xs text-[#7C6FA0] mt-1">{ch.start_time} – {ch.end_time}</p>
+            {/* (1) Clickable address */}
+            <a href={mapsLink(ch.address)} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-[#7A4AED] mt-0.5 block truncate">
+              📍 {ch.address}
+            </a>
           </div>
         </div>
         <p className="text-[13px] text-[#1A1035]/70 mt-3 leading-relaxed">{ch.challenge_description}</p>
@@ -143,29 +190,46 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-4 gap-2">
         <button onClick={() => togglePanel("tips")}
-          className={`rounded-2xl py-3.5 text-center transition-all active:scale-95 ${
+          className={`rounded-2xl py-3 text-center transition-all active:scale-95 ${
             panel === "tips" ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/25" : "bg-white border border-[#E8E2F4] shadow-sm"
           }`}>
-          <span className="text-lg block mb-0.5">💡</span>
-          <span className="text-[10px] font-semibold">Tips</span>
+          <span className="text-base block mb-0.5">💡</span>
+          <span className="text-[9px] font-semibold">Tips</span>
         </button>
         <button onClick={() => togglePanel("checklist")}
-          className={`rounded-2xl py-3.5 text-center transition-all active:scale-95 ${
+          className={`rounded-2xl py-3 text-center transition-all active:scale-95 ${
             panel === "checklist" ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/25" : "bg-white border border-[#E8E2F4] shadow-sm"
           }`}>
-          <span className="text-lg block mb-0.5">✅</span>
-          <span className="text-[10px] font-semibold">Checklist</span>
+          <span className="text-base block mb-0.5">✅</span>
+          <span className="text-[9px] font-semibold">Checklist</span>
         </button>
+        {/* (11) Photo */}
+        <button onClick={() => fileRef.current?.click()}
+          className="rounded-2xl py-3 text-center bg-white border border-[#E8E2F4] shadow-sm active:scale-95 transition-transform">
+          <span className="text-base block mb-0.5">📷</span>
+          <span className="text-[9px] font-semibold">Photo</span>
+        </button>
+        <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
         {ch.contact_phone ? (
           <a href={`tel:${ch.contact_phone.replace(/\s/g, "")}`}
-            className="rounded-2xl py-3.5 text-center bg-white border border-[#E8E2F4] shadow-sm active:scale-95 transition-transform">
-            <span className="text-lg block mb-0.5">📞</span>
-            <span className="text-[10px] font-semibold">Appeler</span>
+            className="rounded-2xl py-3 text-center bg-white border border-[#E8E2F4] shadow-sm active:scale-95 transition-transform">
+            <span className="text-base block mb-0.5">📞</span>
+            <span className="text-[9px] font-semibold">Appeler</span>
           </a>
         ) : <div />}
       </div>
+
+      {/* (11) Photo gallery */}
+      {photos[ch.id] && photos[ch.id].length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {photos[ch.id].map((url, i) => (
+            <img key={i} src={url} alt={`Photo ${i + 1}`}
+              className="w-20 h-20 rounded-xl object-cover shrink-0 border border-[#E8E2F4]" />
+          ))}
+        </div>
+      )}
 
       {/* Panels */}
       {panel === "tips" && (
@@ -193,15 +257,25 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
       )}
       {panel === "checklist" && <div className="animate-slide-up"><ChecklistTab challengeId={ch.id} /></div>}
 
-      {/* Nav */}
-      <div className="flex gap-2.5">
+      {/* (2) Manual complete + Nav */}
+      <div className="flex gap-2">
         <button onClick={timer.goPrev} disabled={timer.currentChallengeIndex === 0}
-          className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4] text-xs font-semibold text-[#1A1035] disabled:opacity-20 active:scale-95 transition-transform shadow-sm">← Précédent</button>
+          className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4] text-xs font-semibold text-[#1A1035] disabled:opacity-20 active:scale-95 transition-transform shadow-sm">
+          ← Préc.
+        </button>
+        {isActive && (
+          <button onClick={timer.goNext}
+            className="h-11 px-4 rounded-xl bg-emerald-500 text-white text-xs font-semibold active:scale-95 transition-transform shadow-sm">
+            Terminé ✓
+          </button>
+        )}
         {timer.isManualOverride && (
-          <button onClick={timer.resetToAuto} className="h-11 px-4 rounded-xl bg-[#F3F0FA] text-[#7A4AED] text-xs font-semibold">Auto</button>
+          <button onClick={timer.resetToAuto} className="h-11 px-3 rounded-xl bg-[#F3F0FA] text-[#7A4AED] text-xs font-semibold">Auto</button>
         )}
         <button onClick={timer.goNext} disabled={timer.currentChallengeIndex === challenges.length - 1}
-          className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4] text-xs font-semibold text-[#1A1035] disabled:opacity-20 active:scale-95 transition-transform shadow-sm">Suivant →</button>
+          className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4] text-xs font-semibold text-[#1A1035] disabled:opacity-20 active:scale-95 transition-transform shadow-sm">
+          Suiv. →
+        </button>
       </div>
 
       {/* Transport */}
@@ -228,6 +302,9 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
           </a>
         ))}
       </div>
+
+      {/* (8) Swipe hint */}
+      <p className="text-[10px] text-center text-[#7C6FA0]/40">Swipe ← → pour naviguer</p>
     </div>
   );
 }

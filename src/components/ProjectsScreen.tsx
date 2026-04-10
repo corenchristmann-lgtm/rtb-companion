@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useNotes } from "@/hooks/useSupabase";
+import { useNotes, useAllNotes } from "@/hooks/useSupabase";
+import { TEAMS } from "@/lib/teams";
 import type { Team, TeamProject } from "@/lib/teams";
 import { CompanyLogo } from "./CompanyLogo";
 
@@ -17,7 +18,9 @@ interface Props {
 
 export function ProjectsScreen({ challenges, projects, team }: Props) {
   const { notes } = useNotes();
+  const allNotes = useAllNotes();
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [showOtherTeams, setShowOtherTeams] = useState(false);
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-3">
@@ -96,6 +99,40 @@ export function ProjectsScreen({ challenges, projects, team }: Props) {
           </div>
         );
       })}
+
+      {/* (13) Cross-team scores */}
+      <button onClick={() => setShowOtherTeams(!showOtherTeams)}
+        className="w-full h-11 rounded-xl bg-[#F3F0FA] text-[#7A4AED] text-xs font-semibold active:scale-95 transition-transform">
+        {showOtherTeams ? "Masquer les autres équipes ▴" : "Voir les autres équipes ▾"}
+      </button>
+
+      {showOtherTeams && (
+        <div className="space-y-2 animate-slide-up">
+          {TEAMS.filter(t => t.id !== team.id).map(otherTeam => {
+            const teamProjects = otherTeam.projects;
+            const teamNotes = allNotes.filter(n => teamProjects.some(p => p.db_id === n.project_id));
+            const teamScores = teamNotes.filter(n => n.score).map(n => n.score!);
+            const teamAvg = teamScores.length > 0 ? (teamScores.reduce((a, b) => a + b, 0) / teamScores.length).toFixed(1) : "–";
+            const scoredCount = new Set(teamNotes.filter(n => n.score).map(n => n.challenge_id)).size;
+
+            return (
+              <div key={otherTeam.id} className="rounded-xl border border-[#E8E2F4] bg-white px-4 py-3 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-[#1A1035]">{otherTeam.name}</p>
+                    <p className="text-[10px] text-[#7C6FA0]">{otherTeam.accompanist} · {otherTeam.projects.length} projets</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold tabular-nums text-[#1A1035]">{teamAvg}</p>
+                    <p className="text-[10px] text-[#7C6FA0]">{scoredCount}/8 notés</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          <p className="text-[10px] text-[#7C6FA0]/50 text-center">Mis à jour toutes les 30 secondes</p>
+        </div>
+      )}
 
       {/* Rules */}
       <div className="rounded-2xl border border-[#F46277]/20 bg-[#FFE3E8]/50 p-4 mt-2">
