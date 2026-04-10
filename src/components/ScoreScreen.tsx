@@ -48,10 +48,9 @@ export function ScoreScreen({ timer, challenges, projects }: Props) {
       <p className="text-[11px] text-[#7C6FA0] px-1">{ch.company} · {ch.format}</p>
 
       <div className="space-y-2.5">
-        {projects.map((p, pIdx) => {
-          const projectId = pIdx + 1;
-          const note = notes.find((n) => n.project_id === projectId && n.challenge_id === ch.id) ?? null;
-          return <ScoreCard key={pIdx} project={p} projectId={projectId} challengeId={ch.id} note={note} onUpdate={upsertNote} />;
+        {projects.map((p) => {
+          const note = notes.find((n) => n.project_id === p.db_id && n.challenge_id === ch.id) ?? null;
+          return <ScoreCard key={p.db_id} project={p} projectId={p.db_id} challengeId={ch.id} note={note} onUpdate={upsertNote} />;
         })}
       </div>
     </div>

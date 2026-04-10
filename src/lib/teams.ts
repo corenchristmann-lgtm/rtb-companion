@@ -26,6 +26,7 @@ export interface ScheduleSlot {
 }
 
 export interface TeamProject {
+  db_id: number; // Supabase projects.id
   name: string;
   members: string[];
   description: string;
@@ -183,10 +184,10 @@ export const TEAMS: Team[] = [
       ["evs", "13:30", "14:00"], ["defenso", "14:30", "15:00"], ["akt", "16:00", "16:30"], ["vedia", "16:30", "17:00"],
     ),
     projects: [
-      { name: "Bissap Origins", members: ["Matteo Raffaelli", "Boubacar Bah", "Elvis Amaizo", "Emmanuel Devo"], description: "Boissons naturelles à base d'hibiscus africain." },
-      { name: "LaJusteDose", members: ["Mélodie Kubushishi"], description: "Solutions low-tech pour la distribution de médicaments." },
-      { name: "Camille Changeur", members: ["Camille Changeur"], description: "Photographe spécialisée animaux de compagnie." },
-      { name: "VILO", members: ["Guillaume Vilet"], description: "Plateforme de contenu événementiel." },
+      { db_id: 101, name: "Bissap Origins", members: ["Matteo Raffaelli", "Boubacar Bah", "Elvis Amaizo", "Emmanuel Devo"], description: "Boissons naturelles à base d'hibiscus africain." },
+      { db_id: 102, name: "LaJusteDose", members: ["Mélodie Kubushishi"], description: "Solutions low-tech pour la distribution de médicaments." },
+      { db_id: 103, name: "Camille Changeur", members: ["Camille Changeur"], description: "Photographe spécialisée animaux de compagnie." },
+      { db_id: 104, name: "VILO", members: ["Guillaume Vilet"], description: "Plateforme de contenu événementiel." },
     ],
   },
   {
@@ -196,11 +197,11 @@ export const TEAMS: Team[] = [
       ["defenso", "13:45", "14:15"], ["akt", "15:15", "15:45"], ["vedia", "16:00", "16:30"], ["bnp", "17:00", "17:30"],
     ),
     projects: [
-      { name: "MOTODISTRI", members: ["Hugo Fizaine", "Esteban Gilles"], description: "Distribution de motos." },
-      { name: "Savvymind", members: ["Thomas Ansotte", "Victoria ?"], description: "Éducation et formation." },
-      { name: "Trésor du sénior", members: ["Lesly Yemtchom"], description: "Services aux seniors." },
-      { name: "Encre Soi", members: ["François Halleux"], description: "Écriture créative." },
-      { name: "Preventia", members: ["Romain Blanchard"], description: "Prévention et sécurité." },
+      { db_id: 201, name: "MOTODISTRI", members: ["Hugo Fizaine", "Esteban Gilles"], description: "Distribution de motos." },
+      { db_id: 202, name: "Savvymind", members: ["Thomas Ansotte", "Victoria ?"], description: "Éducation et formation." },
+      { db_id: 203, name: "Trésor du sénior", members: ["Lesly Yemtchom"], description: "Services aux seniors." },
+      { db_id: 204, name: "Encre Soi", members: ["François Halleux"], description: "Écriture créative." },
+      { db_id: 205, name: "Preventia", members: ["Romain Blanchard"], description: "Prévention et sécurité." },
     ],
   },
   {
@@ -210,12 +211,12 @@ export const TEAMS: Team[] = [
       ["akt", "14:15", "14:45"], ["vedia", "15:00", "15:30"], ["bnp", "16:00", "16:30"], ["ucm", "17:00", "17:30"],
     ),
     projects: [
-      { name: "Niva", members: ["Eva Dequen"], description: "Marque lifestyle." },
-      { name: "DreamPassion", members: ["Terence Salvador Ramos"], description: "Véhicules de passion." },
-      { name: "Athena", members: ["Yoni Austen"], description: "Solutions IT." },
-      { name: "Studio Lola Mallue", members: ["Lola Mallue"], description: "Studio créatif." },
-      { name: "Pierre-Louis Jehaes", members: ["Pierre-Louis Jehaes"], description: "" },
-      { name: "Amaury Baret", members: ["Amaury Baret"], description: "" },
+      { db_id: 301, name: "Niva", members: ["Eva Dequen"], description: "Marque lifestyle." },
+      { db_id: 302, name: "DreamPassion", members: ["Terence Salvador Ramos"], description: "Véhicules de passion." },
+      { db_id: 303, name: "Athena", members: ["Yoni Austen"], description: "Solutions IT." },
+      { db_id: 304, name: "Studio Lola Mallue", members: ["Lola Mallue"], description: "Studio créatif." },
+      { db_id: 305, name: "Pierre-Louis Jehaes", members: ["Pierre-Louis Jehaes"], description: "" },
+      { db_id: 306, name: "Amaury Baret", members: ["Amaury Baret"], description: "" },
     ],
   },
   {
@@ -225,10 +226,10 @@ export const TEAMS: Team[] = [
       ["vedia", "14:15", "14:45"], ["bnp", "15:15", "15:45"], ["ucm", "16:15", "16:45"], ["we", "17:15", "17:45"],
     ),
     projects: [
-      { name: "Arion Studio", members: ["Thomas Hauglustaine", "Grégoire Briot"], description: "Studio web B2B." },
-      { name: "Green Rush", members: ["Pauline Tans"], description: "Restauration healthy." },
-      { name: "PEB Connect", members: ["Tom Thibaut"], description: "Plateforme PEB." },
-      { name: "Purrfect Love", members: ["Zoé Libert"], description: "Café littéraire." },
+      { db_id: 401, name: "Arion Studio", members: ["Thomas Hauglustaine", "Grégoire Briot"], description: "Studio web B2B." },
+      { db_id: 402, name: "Green Rush", members: ["Pauline Tans"], description: "Restauration healthy." },
+      { db_id: 403, name: "PEB Connect", members: ["Tom Thibaut"], description: "Plateforme PEB." },
+      { db_id: 404, name: "Purrfect Love", members: ["Zoé Libert"], description: "Café littéraire." },
     ],
   },
   {
@@ -238,10 +239,10 @@ export const TEAMS: Team[] = [
       ["bnp", "14:15", "14:45"], ["ucm", "15:15", "15:45"], ["we", "16:00", "16:30"], ["loterie", "17:00", "17:30"],
     ),
     projects: [
-      { name: "Opus", members: ["Alexandre Verrechia", "Nathan Remacle"], description: "Web." },
-      { name: "AuraZ Events", members: ["Célia Capitano"], description: "Événementiel." },
-      { name: "La Veilleuse", members: ["Marie-Ève Lapierre-Lemoyne"], description: "Projet culturel." },
-      { name: "Spirugreen", members: ["Wissam Amezian"], description: "Boisson spiruline." },
+      { db_id: 501, name: "Opus", members: ["Alexandre Verrechia", "Nathan Remacle"], description: "Web." },
+      { db_id: 502, name: "AuraZ Events", members: ["Célia Capitano"], description: "Événementiel." },
+      { db_id: 503, name: "La Veilleuse", members: ["Marie-Ève Lapierre-Lemoyne"], description: "Projet culturel." },
+      { db_id: 504, name: "Spirugreen", members: ["Wissam Amezian"], description: "Boisson spiruline." },
     ],
   },
   {
@@ -251,10 +252,10 @@ export const TEAMS: Team[] = [
       ["ucm", "13:30", "14:00"], ["we", "14:15", "14:45"], ["loterie", "15:15", "15:45"], ["evs", "16:45", "17:15"],
     ),
     projects: [
-      { name: "FluxBee", members: ["Sacha Waltzing", "Esteban Zola-Batomene"], description: "IT & réseaux." },
-      { name: "Muse", members: ["Fanny Bozzi", "Héloïse Ruidant"], description: "Upcycling concept." },
-      { name: "ClearDeal", members: ["Mohamed Hajjout Boukraa"], description: "Plateforme acheteur-vendeur." },
-      { name: "Sody", members: ["Sofiane Daoui"], description: "Coffee shop." },
+      { db_id: 601, name: "FluxBee", members: ["Sacha Waltzing", "Esteban Zola-Batomene"], description: "IT & réseaux." },
+      { db_id: 602, name: "Muse", members: ["Fanny Bozzi", "Héloïse Ruidant"], description: "Upcycling concept." },
+      { db_id: 603, name: "ClearDeal", members: ["Mohamed Hajjout Boukraa"], description: "Plateforme acheteur-vendeur." },
+      { db_id: 604, name: "Sody", members: ["Sofiane Daoui"], description: "Coffee shop." },
     ],
   },
   {
@@ -264,10 +265,10 @@ export const TEAMS: Team[] = [
       ["we", "12:45", "13:15"], ["loterie", "14:15", "14:45"], ["evs", "15:45", "16:15"], ["defenso", "17:00", "17:30"],
     ),
     projects: [
-      { name: "IsiRecycle", members: ["Laurine Schmitz", "Tomas Ruelle"], description: "Mobilier éco-responsable." },
-      { name: "Eclau", members: ["Lisa Simon"], description: "Studio créatif." },
-      { name: "HDF Web Development", members: ["Lucas Henry de Frahan"], description: "Développement web." },
-      { name: "Studio 9", members: ["Maxence Praneuf"], description: "Production culturelle." },
+      { db_id: 701, name: "IsiRecycle", members: ["Laurine Schmitz", "Tomas Ruelle"], description: "Mobilier éco-responsable." },
+      { db_id: 702, name: "Eclau", members: ["Lisa Simon"], description: "Studio créatif." },
+      { db_id: 703, name: "HDF Web Development", members: ["Lucas Henry de Frahan"], description: "Développement web." },
+      { db_id: 704, name: "Studio 9", members: ["Maxence Praneuf"], description: "Production culturelle." },
     ],
   },
   {
@@ -277,10 +278,10 @@ export const TEAMS: Team[] = [
       ["we", "12:15", "12:45"], ["loterie", "13:45", "14:15"], ["evs", "15:00", "15:30"], ["defenso", "16:15", "16:45"],
     ),
     projects: [
-      { name: "DOGGO", members: ["Joé Wagener", "Axelle Bielecki"], description: "Projet autour des chiens." },
-      { name: "FloWell Consulting", members: ["Florence Mazy"], description: "Bien-être au travail." },
-      { name: "Epivia", members: ["Ilyass Bahati"], description: "Robotique." },
-      { name: "ThererTouch", members: ["William Therer"], description: "Graphic design." },
+      { db_id: 801, name: "DOGGO", members: ["Joé Wagener", "Axelle Bielecki"], description: "Projet autour des chiens." },
+      { db_id: 802, name: "FloWell Consulting", members: ["Florence Mazy"], description: "Bien-être au travail." },
+      { db_id: 803, name: "Epivia", members: ["Ilyass Bahati"], description: "Robotique." },
+      { db_id: 804, name: "ThererTouch", members: ["William Therer"], description: "Graphic design." },
     ],
   },
   {
@@ -290,11 +291,11 @@ export const TEAMS: Team[] = [
       ["loterie", "12:30", "13:00"], ["evs", "14:15", "14:45"], ["defenso", "15:15", "15:45"], ["akt", "17:00", "17:30"],
     ),
     projects: [
-      { name: "Paraponera", members: ["Mike Bartholomé", "Tatiana Lamborelle"], description: "Stand de tir." },
-      { name: "Sp'IN", members: ["Fati Rmiqui"], description: "Boisson." },
-      { name: "Musilab", members: ["Jo-hesed Fils-Aimé"], description: "La Centrale musicale." },
-      { name: "Regnum Lab", members: ["Ilan Da Silva"], description: "IA." },
-      { name: "LocalDiscovery", members: ["Charles Léonard"], description: "Tourisme local." },
+      { db_id: 901, name: "Paraponera", members: ["Mike Bartholomé", "Tatiana Lamborelle"], description: "Stand de tir." },
+      { db_id: 902, name: "Sp'IN", members: ["Fati Rmiqui"], description: "Boisson." },
+      { db_id: 903, name: "Musilab", members: ["Jo-hesed Fils-Aimé"], description: "La Centrale musicale." },
+      { db_id: 904, name: "Regnum Lab", members: ["Ilan Da Silva"], description: "IA." },
+      { db_id: 905, name: "LocalDiscovery", members: ["Charles Léonard"], description: "Tourisme local." },
     ],
   },
 ];

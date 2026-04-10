@@ -24,18 +24,17 @@ export function ProjectsScreen({ challenges, projects, team }: Props) {
       <h1 className="text-lg font-bold text-[#1A1035] mb-0.5">Projets</h1>
       <p className="text-[11px] text-[#7C6FA0] mb-4">{team.name} · {team.accompanist} · {projects.length} projets</p>
 
-      {projects.map((p, pIdx) => {
-        const projectId = pIdx + 1;
-        const pNotes = notes.filter((n) => n.project_id === projectId);
+      {projects.map((p) => {
+        const pNotes = notes.filter((n) => n.project_id === p.db_id);
         const scores = pNotes.filter((n) => n.score).map((n) => n.score!);
         const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
         const avgStr = scores.length > 0 ? avg.toFixed(1) : "–";
         const count = pNotes.filter((n) => n.free_notes || n.score).length;
-        const open = openIdx === pIdx;
+        const open = openIdx === p.db_id;
 
         return (
-          <div key={pIdx} className="rounded-2xl border border-[#E8E2F4] bg-white shadow-sm overflow-hidden">
-            <button onClick={() => setOpenIdx(open ? null : pIdx)} className="w-full p-4 text-left">
+          <div key={p.db_id} className="rounded-2xl border border-[#E8E2F4] bg-white shadow-sm overflow-hidden">
+            <button onClick={() => setOpenIdx(open ? null : p.db_id)} className="w-full p-4 text-left">
               <div className="flex items-start gap-3">
                 <div className="w-11 h-11 rounded-xl bg-[#F3F0FA] flex items-center justify-center text-base font-bold text-[#7A4AED] shrink-0">
                   {p.name[0]}
