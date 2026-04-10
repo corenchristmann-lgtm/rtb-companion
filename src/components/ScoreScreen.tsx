@@ -85,7 +85,7 @@ function ScoreCard({ project, projectId, challengeId, note, onUpdate }: {
         </div>
       </div>
       <button onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-1.5 text-[10px] text-[#7C6FA0] font-semibold border-t border-[#E8E2F4] bg-[#FAFAFA]">
+        className="w-full px-4 py-1.5 text-[10px] text-[#7C6FA0] font-semibold border-t border-[#E8E2F4] bg-[#FFF5F7]">
         {expanded ? "Masquer ▴" : "Détails ▾"}
       </button>
       {expanded && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { CONTACTS } from "@/lib/teams";
 import type { Team } from "@/lib/teams";
 import { formatTime } from "@/hooks/useTimer";
@@ -39,6 +40,9 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
   if (!timer.isEventDay && !timer.isManualOverride) {
     return (
       <div className="px-4 pt-10 pb-4 max-w-lg mx-auto text-center space-y-6">
+        <div className="flex justify-center mb-2">
+          <Image src="/logos/venturelab.svg" alt="VentureLab" width={140} height={46} unoptimized />
+        </div>
         <div>
           <h1 className="text-lg font-bold text-[#1A1035]">Road-to-Business</h1>
           <p className="text-xs text-[#7C6FA0] mt-0.5">{team.name} · {team.accompanist}</p>
@@ -203,12 +207,12 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
       {/* Transport */}
       {ch.transport_to_next && (
         <div className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm">
-          <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest mb-1">Prochain transport</p>
+          <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest mb-1">Comment aller au prochain atelier</p>
           <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.transport_to_next}</p>
           {ch.directions_url && (
             <a href={ch.directions_url} target="_blank" rel="noopener noreferrer"
               className="mt-2.5 flex items-center justify-center gap-2 h-11 bg-[#7A4AED] text-white rounded-xl text-sm font-semibold shadow-sm shadow-[#7A4AED]/20 active:scale-95 transition-transform">
-              📍 Ouvrir dans Google Maps
+              📍 Itinéraire vers le prochain atelier
             </a>
           )}
         </div>

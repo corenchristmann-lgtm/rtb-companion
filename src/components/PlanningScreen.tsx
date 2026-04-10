@@ -72,7 +72,7 @@ export function PlanningScreen({ timer, challenges, focusId, onClearFocus }: Pro
                         <p className="text-[10px] text-gray-300 flex-1 truncate">→ {ch.transport_to_next}</p>
                         {ch.directions_url && (
                           <a href={ch.directions_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}
-                            className="text-[9px] font-semibold text-[#7A4AED] bg-[#F3F0FA] px-1.5 py-0.5 rounded shrink-0">Maps</a>
+                            className="text-[9px] font-semibold text-[#7A4AED] bg-[#F3F0FA] px-1.5 py-0.5 rounded shrink-0">Itinéraire</a>
                         )}
                       </div>
                     )}
@@ -148,12 +148,12 @@ function ChallengeInfo({ ch }: { ch: Challenge }) {
       </div>
       {ch.transport_to_next && (
         <div className="rounded-xl bg-[#F3F0FA] p-3">
-          <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest mb-0.5">Transport</p>
+          <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest mb-0.5">Vers le prochain atelier</p>
           <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.transport_to_next}</p>
           {ch.directions_url && (
             <a href={ch.directions_url} target="_blank" rel="noopener noreferrer"
               className="mt-2 flex items-center justify-center gap-2 h-10 bg-[#7A4AED] text-white rounded-lg text-xs font-semibold active:scale-95 transition-transform">
-              📍 Ouvrir dans Google Maps
+              📍 Itinéraire vers le prochain atelier
             </a>
           )}
         </div>
