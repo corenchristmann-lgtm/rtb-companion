@@ -178,7 +178,11 @@ export function usePhotoReactions(photoId: number) {
     setReactions(lsGet(lsKey, []));
   }, [photoId, lsKey]);
 
-  useEffect(() => { fetchReactions(); }, [fetchReactions]);
+  useEffect(() => {
+    fetchReactions();
+    const interval = setInterval(fetchReactions, 10000);
+    return () => clearInterval(interval);
+  }, [fetchReactions]);
 
   const addReaction = useCallback(async (emoji: string, teamName: string) => {
     // Check if this team already reacted with this emoji — if so, remove it (toggle)
@@ -186,6 +190,7 @@ export function usePhotoReactions(photoId: number) {
     if (existing) {
       setReactions(prev => prev.filter(r => r.id !== existing.id));
       try { await getSupabase().from("photo_reactions").delete().eq("id", existing.id); } catch {}
+      fetchReactions();
       return;
     }
     const optimistic: PhotoReaction = { id: Date.now(), photo_id: photoId, emoji, team_name: teamName, created_at: new Date().toISOString() };
@@ -194,7 +199,7 @@ export function usePhotoReactions(photoId: number) {
       const { data } = await getSupabase().from("photo_reactions").insert({ photo_id: photoId, emoji, team_name: teamName }).select().single();
       if (data) setReactions(prev => prev.map(r => r.id === optimistic.id ? (data as PhotoReaction) : r));
     } catch {}
-  }, [photoId, reactions]);
+  }, [photoId, reactions, fetchReactions]);
 
   return { reactions, addReaction };
 }
