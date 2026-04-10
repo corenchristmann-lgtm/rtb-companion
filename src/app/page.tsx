@@ -1,50 +1,43 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Dashboard } from "@/components/Dashboard";
-import { ChallengesList } from "@/components/ChallengesList";
-import { NotesPage } from "@/components/NotesPage";
-import { TeamPage } from "@/components/TeamPage";
+import { NowScreen } from "@/components/NowScreen";
+import { PlanningScreen } from "@/components/PlanningScreen";
+import { ScoreScreen } from "@/components/ScoreScreen";
+import { ProjectsScreen } from "@/components/ProjectsScreen";
 import { BottomNav } from "@/components/BottomNav";
 import { useTimer } from "@/hooks/useTimer";
 import { initializeChecklistIfEmpty } from "@/hooks/useSupabase";
 
-export type Tab = "home" | "challenges" | "notes" | "team";
+export type Tab = "now" | "planning" | "score" | "projects";
 
 export default function Home() {
-  const [tab, setTab] = useState<Tab>("home");
-  const [selectedChallengeId, setSelectedChallengeId] = useState<number | null>(null);
+  const [tab, setTab] = useState<Tab>("now");
+  const [focusChallengeId, setFocusChallengeId] = useState<number | null>(null);
   const timer = useTimer();
 
-  useEffect(() => {
-    initializeChecklistIfEmpty();
-  }, []);
+  useEffect(() => { initializeChecklistIfEmpty(); }, []);
 
   const openChallenge = (id: number) => {
-    setSelectedChallengeId(id);
-    setTab("challenges");
+    setFocusChallengeId(id);
+    setTab("planning");
   };
 
   return (
     <div className="flex flex-col h-dvh">
-      <main className="flex-1 overflow-y-auto pb-[72px]">
-        {tab === "home" && (
-          <Dashboard timer={timer} onOpenChallenge={openChallenge} />
-        )}
-        {tab === "challenges" && (
-          <ChallengesList
+      <main className="flex-1 overflow-y-auto pb-[68px]">
+        {tab === "now" && <NowScreen timer={timer} onOpenChallenge={openChallenge} />}
+        {tab === "planning" && (
+          <PlanningScreen
             timer={timer}
-            selectedId={selectedChallengeId}
-            onSelect={setSelectedChallengeId}
+            focusId={focusChallengeId}
+            onClearFocus={() => setFocusChallengeId(null)}
           />
         )}
-        {tab === "notes" && <NotesPage />}
-        {tab === "team" && <TeamPage />}
+        {tab === "score" && <ScoreScreen timer={timer} />}
+        {tab === "projects" && <ProjectsScreen />}
       </main>
-      <BottomNav active={tab} onChange={(t) => {
-        setTab(t);
-        if (t !== "challenges") setSelectedChallengeId(null);
-      }} />
+      <BottomNav active={tab} onChange={setTab} />
     </div>
   );
 }
