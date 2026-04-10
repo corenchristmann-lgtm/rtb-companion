@@ -208,6 +208,12 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onOpenGall
         ) : <div />}
       </div>
 
+      {/* Gallery button */}
+      <button onClick={onOpenGallery}
+        className="w-full h-12 rounded-2xl bg-[#7A4AED] text-white text-sm font-semibold active:scale-95 transition-transform shadow-md shadow-[#7A4AED]/25">
+        Galerie Photos
+      </button>
+
       {/* Panels */}
       {panel === "tips" && (
         <div className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm animate-slide-up space-y-4">
