@@ -7,37 +7,29 @@ export function ChecklistTab({ challengeId }: { challengeId: number }) {
   const { items, loading, toggleItem, addItem, progress, checkedCount, totalCount } = useChecklist(challengeId);
   const [input, setInput] = useState("");
 
-  if (loading) {
-    return <p className="text-sm text-muted-foreground text-center py-8">Chargement…</p>;
-  }
+  if (loading) return <p className="text-sm text-muted-foreground text-center py-8">Chargement…</p>;
 
   return (
     <div className="space-y-3">
-      {/* Progress bar */}
-      <div className="rounded-2xl border border-border bg-card p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-muted-foreground">Progression</span>
-          <span className="text-xs font-semibold text-primary tabular-nums">{checkedCount}/{totalCount}</span>
+      {/* Progress */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-1.5 bg-[#232136] rounded-full overflow-hidden">
+          <div className="h-full bg-[#7A4AED] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
         </div>
-        <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-          <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
-        </div>
+        <span className="text-[11px] font-bold text-[#7A4AED] tabular-nums shrink-0">{checkedCount}/{totalCount}</span>
       </div>
 
       {/* Items */}
-      <div className="space-y-1">
+      <div className="space-y-0.5">
         {items.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => toggleItem(item.id, !item.is_checked)}
-            className="w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left active:scale-[0.98] transition-all"
-          >
-            <div className={`w-[18px] h-[18px] mt-0.5 rounded border-[1.5px] shrink-0 flex items-center justify-center transition-colors ${
-              item.is_checked ? "bg-emerald-500 border-emerald-500" : "border-muted-foreground/40"
+          <button key={item.id} onClick={() => toggleItem(item.id, !item.is_checked)}
+            className="w-full flex items-start gap-3 px-3 py-2.5 rounded-xl text-left active:scale-[0.98] transition-all">
+            <div className={`w-[20px] h-[20px] mt-px rounded-md border-2 shrink-0 flex items-center justify-center transition-colors ${
+              item.is_checked ? "bg-[#34D399] border-[#34D399]" : "border-[#2E2B45]"
             }`}>
-              {item.is_checked && <span className="text-[10px] text-white">✓</span>}
+              {item.is_checked && <span className="text-[10px] text-white font-bold">✓</span>}
             </div>
-            <span className={`text-sm leading-snug ${item.is_checked ? "line-through text-muted-foreground/50" : ""}`}>
+            <span className={`text-[13px] leading-snug ${item.is_checked ? "line-through text-muted-foreground/40" : "text-foreground/80"}`}>
               {item.label}
             </span>
           </button>
@@ -46,23 +38,13 @@ export function ChecklistTab({ challengeId }: { challengeId: number }) {
 
       {/* Add */}
       <div className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && input.trim()) {
-              addItem(input.trim());
-              setInput("");
-            }
-          }}
-          placeholder="Ajouter un item…"
-          className="flex-1 h-10 px-3 bg-secondary rounded-xl text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50"
-        />
-        <button
-          onClick={() => { if (input.trim()) { addItem(input.trim()); setInput(""); } }}
+        <input value={input} onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" && input.trim()) { addItem(input.trim()); setInput(""); } }}
+          placeholder="Ajouter…"
+          className="flex-1 h-10 px-3 bg-[#232136] rounded-xl text-sm placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-[#7A4AED]/40" />
+        <button onClick={() => { if (input.trim()) { addItem(input.trim()); setInput(""); } }}
           disabled={!input.trim()}
-          className="h-10 w-10 bg-primary text-primary-foreground rounded-xl text-sm font-bold disabled:opacity-30 active:scale-90 transition-transform"
-        >
+          className="h-10 w-10 bg-[#7A4AED] text-white rounded-xl font-bold disabled:opacity-25 active:scale-90 transition-transform">
           +
         </button>
       </div>

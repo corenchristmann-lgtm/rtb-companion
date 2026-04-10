@@ -8,8 +8,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "RTB — Équipe 1",
-  description: "Road-to-Business companion",
+  title: "RTB · Équipe 1",
+  description: "Road-to-Business — VentureLab companion app",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -23,7 +23,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#111118",
+  themeColor: "#0F0E17",
 };
 
 export default function RootLayout({

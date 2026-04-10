@@ -18,41 +18,36 @@ export function ScoreScreen({ timer }: Props) {
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-4">
       <h1 className="text-lg font-bold">Noter</h1>
 
-      {/* Challenge selector — horizontal scroll pills */}
+      {/* Challenge pills */}
       <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
-        {CHALLENGES.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setSelectedChallenge(c.id)}
-            className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
-              selectedChallenge === c.id
-                ? "bg-primary text-primary-foreground"
-                : "bg-card border border-border text-muted-foreground"
-            }`}
-          >
-            <span>{c.emoji}</span>
-            <span>{c.company.split(" ")[0]}</span>
-          </button>
-        ))}
+        {CHALLENGES.map((c) => {
+          const isSelected = selectedChallenge === c.id;
+          const hasNotes = notes.some((n) => n.challenge_id === c.id && n.score);
+          return (
+            <button key={c.id} onClick={() => setSelectedChallenge(c.id)}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                isSelected
+                  ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/20"
+                  : hasNotes
+                  ? "bg-[#34D399]/10 border border-[#34D399]/20 text-[#34D399]"
+                  : "bg-[#1A1927] border border-[#2E2B45] text-muted-foreground"
+              }`}>
+              <span>{c.emoji}</span>
+              <span className="max-w-[60px] truncate">{c.company.split(" ")[0]}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Challenge context */}
-      <div className="rounded-xl bg-secondary/50 px-3 py-2">
-        <p className="text-xs text-muted-foreground">{ch.emoji} {ch.company} · {ch.format}</p>
-      </div>
+      {/* Context */}
+      <p className="text-[11px] text-muted-foreground px-1">{ch.emoji} {ch.company} · {ch.format}</p>
 
-      {/* Project scoring cards */}
-      <div className="space-y-3">
+      {/* Score cards */}
+      <div className="space-y-2.5">
         {PROJECTS.map((p) => {
           const note = notes.find((n) => n.project_id === p.id && n.challenge_id === selectedChallenge) ?? null;
           return (
-            <ProjectScoreCard
-              key={p.id}
-              project={p}
-              challengeId={selectedChallenge}
-              note={note}
-              onUpdate={upsertNote}
-            />
+            <ScoreCard key={p.id} project={p} challengeId={selectedChallenge} note={note} onUpdate={upsertNote} />
           );
         })}
       </div>
@@ -60,11 +55,8 @@ export function ScoreScreen({ timer }: Props) {
   );
 }
 
-function ProjectScoreCard({
-  project,
-  challengeId,
-  note,
-  onUpdate,
+function ScoreCard({
+  project, challengeId, note, onUpdate,
 }: {
   project: (typeof PROJECTS)[number];
   challengeId: number;
@@ -75,70 +67,54 @@ function ProjectScoreCard({
   const score = note?.score ?? 0;
 
   return (
-    <div className="rounded-2xl border border-border bg-card overflow-hidden">
-      {/* Header: project name + quick stars */}
-      <div className="flex items-center gap-2 px-4 py-3">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+    <div className="rounded-2xl border border-[#2E2B45] bg-[#1A1927] overflow-hidden">
+      {/* Header + stars */}
+      <div className="flex items-center gap-2.5 px-4 py-3">
+        <div className="w-9 h-9 rounded-xl bg-[#7A4AED]/10 flex items-center justify-center text-xs font-bold text-[#7A4AED] shrink-0">
           {project.name[0]}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold truncate">{project.name}</p>
           <p className="text-[10px] text-muted-foreground">{project.members}</p>
         </div>
-        {/* Inline star rating — always visible, tap to score */}
-        <div className="flex gap-0.5 shrink-0">
+        <div className="flex shrink-0">
           {[1, 2, 3, 4, 5].map((s) => (
-            <button
-              key={s}
-              onClick={() => onUpdate(project.id, challengeId, { score: s === score ? null : s })}
-              className={`w-8 h-8 flex items-center justify-center text-base rounded-md transition-all active:scale-90 ${
-                s <= score ? "text-amber-400" : "text-muted-foreground/20"
-              }`}
-            >
+            <button key={s} onClick={() => onUpdate(project.id, challengeId, { score: s === score ? null : s })}
+              className={`w-8 h-8 flex items-center justify-center text-[15px] rounded-lg active:scale-90 transition-all ${
+                s <= score ? "text-[#FBBF24]" : "text-[#2E2B45]"
+              }`}>
               ★
             </button>
           ))}
         </div>
       </div>
 
-      {/* Expand toggle */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-1.5 text-[10px] text-muted-foreground font-medium border-t border-border bg-secondary/30 hover:bg-secondary/50 transition-colors"
-      >
-        {expanded ? "Masquer les détails ▴" : "Ajouter des notes ▾"}
+      {/* Expand */}
+      <button onClick={() => setExpanded(!expanded)}
+        className="w-full px-4 py-1.5 text-[10px] text-muted-foreground font-semibold border-t border-[#2E2B45] bg-[#232136]/50 transition-colors">
+        {expanded ? "Masquer ▴" : "Détails ▾"}
       </button>
 
-      {/* Expanded: notes, strength, improvement */}
       {expanded && (
-        <div className="px-4 py-3 space-y-2.5 border-t border-border animate-slide-up">
-          <textarea
-            value={note?.free_notes ?? ""}
+        <div className="px-4 py-3 space-y-2.5 border-t border-[#2E2B45] animate-slide-up">
+          <textarea value={note?.free_notes ?? ""}
             onChange={(e) => onUpdate(project.id, challengeId, { free_notes: e.target.value })}
-            placeholder="Notes libres…"
-            rows={2}
-            className="w-full px-3 py-2 bg-secondary rounded-xl text-sm leading-relaxed placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-primary/40 resize-none"
-          />
+            placeholder="Notes libres…" rows={2}
+            className="w-full px-3 py-2 bg-[#232136] rounded-xl text-sm leading-relaxed placeholder:text-muted-foreground/25 focus:outline-none focus:ring-1 focus:ring-[#7A4AED]/30 resize-none" />
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[9px] font-semibold text-emerald-400/70 uppercase tracking-wider block mb-0.5">Point fort</label>
-              <input
-                type="text"
-                value={note?.strength ?? ""}
+              <label className="text-[9px] font-bold text-[#34D399]/60 uppercase tracking-widest block mb-0.5">Point fort</label>
+              <input type="text" value={note?.strength ?? ""}
                 onChange={(e) => onUpdate(project.id, challengeId, { strength: e.target.value })}
                 placeholder="Force…"
-                className="w-full h-8 px-2.5 bg-secondary rounded-lg text-xs placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-emerald-500/30"
-              />
+                className="w-full h-8 px-2.5 bg-[#232136] rounded-lg text-xs placeholder:text-muted-foreground/25 focus:outline-none focus:ring-1 focus:ring-[#34D399]/25" />
             </div>
             <div>
-              <label className="text-[9px] font-semibold text-amber-400/70 uppercase tracking-wider block mb-0.5">Amélioration</label>
-              <input
-                type="text"
-                value={note?.improvement ?? ""}
+              <label className="text-[9px] font-bold text-[#F46277]/60 uppercase tracking-widest block mb-0.5">Amélioration</label>
+              <input type="text" value={note?.improvement ?? ""}
                 onChange={(e) => onUpdate(project.id, challengeId, { improvement: e.target.value })}
                 placeholder="Axe…"
-                className="w-full h-8 px-2.5 bg-secondary rounded-lg text-xs placeholder:text-muted-foreground/30 focus:outline-none focus:ring-1 focus:ring-amber-500/30"
-              />
+                className="w-full h-8 px-2.5 bg-[#232136] rounded-lg text-xs placeholder:text-muted-foreground/25 focus:outline-none focus:ring-1 focus:ring-[#F46277]/25" />
             </div>
           </div>
         </div>

@@ -1,11 +1,11 @@
 {
-  "name": "RTB Companion — Équipe 1",
+  "name": "RTB · Équipe 1 — VentureLab",
   "short_name": "RTB",
-  "description": "Road-to-Business companion app",
+  "description": "Road-to-Business companion",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a1a",
-  "theme_color": "#0a0a1a",
+  "background_color": "#0F0E17",
+  "theme_color": "#7A4AED",
   "orientation": "portrait",
   "icons": [
     {
