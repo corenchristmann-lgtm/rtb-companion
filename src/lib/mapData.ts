@@ -10,14 +10,15 @@ export interface MapLocation {
   color: string;
 }
 
+// All coordinates verified via Nominatim (OpenStreetMap) — April 2026
 export const LOCATIONS: Record<string, MapLocation> = {
-  bnp: { id: "bnp", company: "BNP Paribas Fortis", lat: 50.6428, lng: 5.5712, address: "Place Xavier Neujean 2", color: "#00965E" },
-  ucm: { id: "ucm", company: "UCM", lat: 50.6381, lng: 5.5665, address: "Boulevard d'Avroy 42", color: "#E30613" },
-  we: { id: "we", company: "Wallonie Entreprendre", lat: 50.6368, lng: 5.5628, address: "Avenue Maurice Destenay 13", color: "#F5A623" },
-  loterie: { id: "loterie", company: "Loterie Nationale", lat: 50.6332, lng: 5.5590, address: "Avenue Blonden 84", color: "#D4145A" },
-  evs: { id: "evs", company: "EVS", lat: 50.6130, lng: 5.5270, address: "Rue du Bois Saint-Jean 13, Seraing", color: "#0065B3" },
-  defenso: { id: "defenso", company: "Defenso", lat: 50.6235, lng: 5.5808, address: "Place George Ista 28, Grivegnee", color: "#2D3748" },
-  vl: { id: "vl", company: "VentureLab (AKT + VEDIA)", lat: 50.6420, lng: 5.5735, address: "Rue des Carmes 24", color: "#7A4AED" },
+  bnp: { id: "bnp", company: "BNP Paribas Fortis", lat: 50.64296, lng: 5.56828, address: "Place Xavier Neujean 2", color: "#00965E" },
+  ucm: { id: "ucm", company: "UCM", lat: 50.63844, lng: 5.56765, address: "Boulevard d'Avroy 42", color: "#E30613" },
+  we: { id: "we", company: "Wallonie Entreprendre", lat: 50.63801, lng: 5.56918, address: "Avenue Maurice Destenay 13", color: "#F5A623" },
+  loterie: { id: "loterie", company: "Loterie Nationale", lat: 50.62775, lng: 5.57178, address: "Avenue Blonden 84", color: "#D4145A" },
+  evs: { id: "evs", company: "EVS", lat: 50.59193, lng: 5.55724, address: "Rue du Bois Saint-Jean 13, Seraing", color: "#0065B3" },
+  defenso: { id: "defenso", company: "Defenso", lat: 50.62255, lng: 5.59312, address: "Place Georges Ista 28, Grivegnee", color: "#2D3748" },
+  vl: { id: "vl", company: "VentureLab (AKT + VEDIA)", lat: 50.63985, lng: 5.57396, address: "Rue des Carmes 24", color: "#7A4AED" },
 };
 
 // Map atelier IDs to location IDs (akt and vedia share vl)
@@ -46,5 +47,5 @@ export const TEAM_COLORS = [
 ];
 
 // Liege center for initial map view
-export const LIEGE_CENTER: [number, number] = [50.6340, 5.5650];
-export const DEFAULT_ZOOM = 14;
+export const LIEGE_CENTER: [number, number] = [50.6200, 5.5700];
+export const DEFAULT_ZOOM = 13;
