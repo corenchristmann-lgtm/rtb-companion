@@ -56,10 +56,10 @@ export interface Photo {
   created_at: string;
 }
 
-export interface PhotoComment {
+export interface PhotoReaction {
   id: number;
   photo_id: number;
-  content: string;
+  emoji: string;
   team_name: string;
   created_at: string;
 }

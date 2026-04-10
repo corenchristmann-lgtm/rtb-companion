@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getSupabase } from "@/lib/supabase";
-import type { ChecklistItem, Note, Photo, PhotoComment } from "@/types/database";
+import type { ChecklistItem, Note, Photo, PhotoReaction } from "@/types/database";
 import { DEFAULT_CHECKLIST } from "@/lib/teams";
 
 // ── Offline helpers ──
@@ -165,31 +165,38 @@ export function usePhotos() {
   return { photos, loading, uploading, uploadPhoto, refresh: fetchPhotos };
 }
 
-// ── Photo comments ──
-export function usePhotoComments(photoId: number) {
-  const [comments, setComments] = useState<PhotoComment[]>([]);
-  const lsKey = `rtb-photo-comments-${photoId}`;
+// ── Photo reactions (emoji) ──
+export function usePhotoReactions(photoId: number) {
+  const [reactions, setReactions] = useState<PhotoReaction[]>([]);
+  const lsKey = `rtb-photo-reactions-${photoId}`;
 
-  const fetchComments = useCallback(async () => {
+  const fetchReactions = useCallback(async () => {
     try {
-      const { data } = await getSupabase().from("photo_comments").select("*").eq("photo_id", photoId).order("created_at", { ascending: true });
-      if (data) { setComments(data as PhotoComment[]); lsSet(lsKey, data); return; }
+      const { data } = await getSupabase().from("photo_reactions").select("*").eq("photo_id", photoId).order("created_at", { ascending: true });
+      if (data) { setReactions(data as PhotoReaction[]); lsSet(lsKey, data); return; }
     } catch {}
-    setComments(lsGet(lsKey, []));
+    setReactions(lsGet(lsKey, []));
   }, [photoId, lsKey]);
 
-  useEffect(() => { fetchComments(); }, [fetchComments]);
+  useEffect(() => { fetchReactions(); }, [fetchReactions]);
 
-  const addComment = useCallback(async (content: string, teamName: string) => {
-    const optimistic: PhotoComment = { id: Date.now(), photo_id: photoId, content, team_name: teamName, created_at: new Date().toISOString() };
-    setComments(prev => [...prev, optimistic]);
+  const addReaction = useCallback(async (emoji: string, teamName: string) => {
+    // Check if this team already reacted with this emoji — if so, remove it (toggle)
+    const existing = reactions.find(r => r.emoji === emoji && r.team_name === teamName);
+    if (existing) {
+      setReactions(prev => prev.filter(r => r.id !== existing.id));
+      try { await getSupabase().from("photo_reactions").delete().eq("id", existing.id); } catch {}
+      return;
+    }
+    const optimistic: PhotoReaction = { id: Date.now(), photo_id: photoId, emoji, team_name: teamName, created_at: new Date().toISOString() };
+    setReactions(prev => [...prev, optimistic]);
     try {
-      const { data } = await getSupabase().from("photo_comments").insert({ photo_id: photoId, content, team_name: teamName }).select().single();
-      if (data) setComments(prev => prev.map(c => c.id === optimistic.id ? (data as PhotoComment) : c));
+      const { data } = await getSupabase().from("photo_reactions").insert({ photo_id: photoId, emoji, team_name: teamName }).select().single();
+      if (data) setReactions(prev => prev.map(r => r.id === optimistic.id ? (data as PhotoReaction) : r));
     } catch {}
-  }, [photoId]);
+  }, [photoId, reactions]);
 
-  return { comments, addComment };
+  return { reactions, addReaction };
 }
 
 // ── Init checklist ──

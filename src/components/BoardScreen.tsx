@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { CONTACTS } from "@/lib/teams";
 import type { Team } from "@/lib/teams";
 import { formatTime } from "@/hooks/useTimer";
+import { usePhotos } from "@/hooks/useSupabase";
 import { CompanyLogo } from "./CompanyLogo";
 
 interface Challenge {
@@ -29,8 +30,25 @@ function mapsLink(address: string) {
 
 export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const { uploading, uploadPhoto } = usePhotos();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const activeRef = useRef<HTMLDivElement>(null);
 
   const isEventDay = timer.isEventDay || timer.isManualOverride;
+
+  // Auto-scroll to active challenge on event day
+  useEffect(() => {
+    if (isEventDay && timer.status === "active" && activeRef.current) {
+      activeRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [isEventDay, timer.status, timer.currentChallengeIndex]);
+
+  const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    uploadPhoto(file, team.name);
+    e.target.value = "";
+  };
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-5">
@@ -92,20 +110,21 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
             const isExpanded = expandedId === ch.id;
 
             return (
-              <div key={ch.id}>
+              <div key={ch.id} ref={isActive ? activeRef : undefined}>
                 {/* Challenge row */}
-                <div className="flex items-center gap-2.5">
+                <div className={`flex items-center gap-2.5 rounded-2xl transition-all ${
+                  isActive ? "bg-[#7A4AED]/10 border-2 border-[#7A4AED]/40 p-1.5 -mx-1.5 shadow-md shadow-[#7A4AED]/10" : ""
+                }`}>
                   <button
                     onClick={() => setExpandedId(isExpanded ? null : ch.id)}
                     className={`flex-1 flex items-center gap-2.5 py-2 rounded-xl px-2 active:scale-[0.98] transition-all ${
-                      isActive ? "bg-[#F3F0FA] ring-1 ring-[#7A4AED]/30" :
-                      isDone ? "opacity-60" : ""
+                      isDone ? "opacity-50" : ""
                     }`}
                   >
-                    <CompanyLogo src={ch.emoji ?? ""} company={ch.company} size={34} />
+                    <CompanyLogo src={ch.emoji ?? ""} company={ch.company} size={isActive ? 40 : 34} />
                     <div className="flex-1 min-w-0 text-left">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-[#1A1035] truncate">{ch.company}</p>
+                        <p className={`font-semibold truncate ${isActive ? "text-base text-[#7A4AED]" : "text-sm text-[#1A1035]"}`}>{ch.company}</p>
                         {isActive && (
                           <span className="text-[8px] font-bold text-white bg-[#7A4AED] px-1.5 py-0.5 rounded-full shrink-0 animate-breathe">
                             EN COURS
@@ -113,11 +132,11 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
                         )}
                         {isDone && (
                           <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full shrink-0">
-                            FAIT
+                            ✓
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] text-[#7C6FA0]">
+                      <p className={`text-[11px] ${isActive ? "text-[#7A4AED]/70 font-medium" : "text-[#7C6FA0]"}`}>
                         <span className="font-semibold tabular-nums">{ch.start_time} – {ch.end_time}</span>
                         {" · "}{ch.format}
                       </p>
@@ -251,6 +270,13 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
           ))}
         </div>
       </div>
+
+      {/* Quick photo */}
+      <button onClick={() => fileRef.current?.click()} disabled={uploading}
+        className="w-full h-11 rounded-2xl bg-white border border-[#E8E2F4] text-sm font-semibold text-[#7C6FA0] shadow-sm active:scale-[0.98] transition-transform disabled:opacity-50">
+        {uploading ? "Envoi..." : "📷 Prendre une photo"}
+      </button>
+      <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
 
       {/* Manual nav (event day) */}
       {isEventDay && (

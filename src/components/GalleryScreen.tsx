@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { usePhotos, usePhotoComments } from "@/hooks/useSupabase";
+import { usePhotos, usePhotoReactions } from "@/hooks/useSupabase";
 import type { Photo } from "@/types/database";
 import { TEAMS } from "@/lib/teams";
 
@@ -10,6 +10,7 @@ interface Props {
 }
 
 const TEAM_NAMES = TEAMS.map((t) => t.name);
+const REACTION_EMOJIS = ["🔥", "💪", "😂", "👏", "❤️", "🎉"];
 
 export function GalleryScreen({ teamName }: Props) {
   const { photos, loading, uploading, uploadPhoto } = usePhotos();
@@ -48,7 +49,6 @@ export function GalleryScreen({ teamName }: Props) {
     setCaption("");
   };
 
-  // Cleanup preview URL on unmount
   useEffect(() => {
     return () => { if (pendingPreview) URL.revokeObjectURL(pendingPreview); };
   }, [pendingPreview]);
@@ -151,7 +151,7 @@ export function GalleryScreen({ teamName }: Props) {
         </div>
       )}
 
-      {/* Fullscreen lightbox with comments */}
+      {/* Fullscreen lightbox with reactions */}
       {viewPhoto && (
         <PhotoLightbox photo={viewPhoto} teamName={teamName} onClose={() => setViewPhoto(null)} />
       )}
@@ -160,14 +160,17 @@ export function GalleryScreen({ teamName }: Props) {
 }
 
 function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: string; onClose: () => void }) {
-  const { comments, addComment } = usePhotoComments(photo.id);
-  const [input, setInput] = useState("");
+  const { reactions, addReaction } = usePhotoReactions(photo.id);
 
-  const handleSubmit = () => {
-    if (!input.trim()) return;
-    addComment(input.trim(), teamName);
-    setInput("");
-  };
+  // Group reactions by emoji: { "🔥": { count: 3, myTeam: true } }
+  const grouped = REACTION_EMOJIS.map((emoji) => {
+    const matching = reactions.filter((r) => r.emoji === emoji);
+    return {
+      emoji,
+      count: matching.length,
+      myTeam: matching.some((r) => r.team_name === teamName),
+    };
+  });
 
   return (
     <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" onClick={onClose}>
@@ -179,11 +182,11 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
 
       {/* Photo */}
       <div className="flex-1 flex items-center justify-center p-4" onClick={onClose}>
-        <img src={photo.url} alt="" className="max-w-full max-h-[55vh] object-contain rounded-lg" />
+        <img src={photo.url} alt="" className="max-w-full max-h-[60vh] object-contain rounded-lg" />
       </div>
 
       {/* Caption + team */}
-      <div className="text-center -mt-2 mb-2 px-4">
+      <div className="text-center -mt-2 mb-3 px-4">
         {photo.team_name && (
           <p className="text-xs text-white/50">{photo.team_name}</p>
         )}
@@ -192,33 +195,22 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
         )}
       </div>
 
-      {/* Comments section */}
-      <div className="px-4 pb-4 space-y-2" onClick={(e) => e.stopPropagation()}>
-        {/* Existing comments */}
-        {comments.length > 0 && (
-          <div className="max-h-[100px] overflow-y-auto space-y-1.5 mb-1">
-            {comments.map((c) => (
-              <div key={c.id} className="flex items-start gap-2">
-                <span className="text-[10px] font-bold text-[#7A4AED] shrink-0 mt-px">{c.team_name}</span>
-                <span className="text-xs text-white/80 leading-snug">{c.content}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Comment input */}
-        <div className="flex gap-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
-            placeholder="Commenter en tant que votre equipe..."
-            className="flex-1 h-10 px-3 bg-white/10 rounded-xl text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[#7A4AED]/50"
-          />
-          <button onClick={handleSubmit} disabled={!input.trim()}
-            className="h-10 px-4 bg-[#7A4AED] text-white rounded-xl text-xs font-semibold disabled:opacity-30 active:scale-95 transition-transform">
-            Envoyer
-          </button>
+      {/* Emoji reactions */}
+      <div className="px-4 pb-6" onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-center gap-2">
+          {grouped.map(({ emoji, count, myTeam }) => (
+            <button key={emoji} onClick={() => addReaction(emoji, teamName)}
+              className={`flex items-center gap-1 px-3 py-2 rounded-2xl text-lg transition-all active:scale-90 ${
+                myTeam
+                  ? "bg-[#7A4AED]/30 ring-1 ring-[#7A4AED]"
+                  : "bg-white/10"
+              }`}>
+              <span>{emoji}</span>
+              {count > 0 && (
+                <span className="text-xs text-white/80 font-semibold">{count}</span>
+              )}
+            </button>
+          ))}
         </div>
       </div>
     </div>
