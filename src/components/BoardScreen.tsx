@@ -127,7 +127,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
 
                   {/* Maps button */}
                   <a href={mapsLink(ch.address)} target="_blank" rel="noopener noreferrer"
-                    className="shrink-0 w-10 h-10 rounded-xl bg-[#7A4AED] text-white flex items-center justify-center text-lg active:scale-90 transition-transform shadow-sm shadow-[#7A4AED]/20">
+                    className="shrink-0 w-9 h-9 rounded-lg bg-[#F3F0FA] flex items-center justify-center text-base active:scale-90 transition-transform">
                     📍
                   </a>
                 </div>

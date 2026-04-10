@@ -143,7 +143,7 @@ export function usePhotos() {
     return () => clearInterval(interval);
   }, [fetchPhotos]);
 
-  const uploadPhoto = useCallback(async (file: File, teamName: string) => {
+  const uploadPhoto = useCallback(async (file: File, teamName: string, caption?: string) => {
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";
@@ -152,7 +152,9 @@ export function usePhotos() {
       if (uploadErr) throw uploadErr;
       const { data: urlData } = getSupabase().storage.from("photos").getPublicUrl(path);
       const url = urlData.publicUrl;
-      const { data } = await getSupabase().from("photos").insert({ url, team_name: teamName }).select().single();
+      const insert: Record<string, string> = { url, team_name: teamName };
+      if (caption) insert.caption = caption;
+      const { data } = await getSupabase().from("photos").insert(insert).select().single();
       if (data) setPhotos(prev => [data as Photo, ...prev]);
     } catch (err) {
       console.error("Photo upload failed:", err);
