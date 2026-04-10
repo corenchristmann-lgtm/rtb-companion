@@ -1,11 +1,27 @@
 import type { Challenge, Project } from "@/types/database";
 
+// Google Maps directions helper: walking by default, transit where needed
+function gmaps(from: string, to: string, mode: "walking" | "transit" | "driving" = "walking"): string {
+  const travelmode = mode === "walking" ? "walking" : mode === "transit" ? "transit" : "driving";
+  return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=${travelmode}`;
+}
+
+const ADDR = {
+  bnp: "Place Xavier Neujean 2, 4000 Liège",
+  ucm: "Boulevard d'Avroy 42, 4000 Liège",
+  we: "Avenue Maurice Destenay 13, 4000 Liège",
+  loterie: "Avenue Blonden 84, 4000 Liège",
+  evs: "Rue du Bois Saint-Jean 13, 4102 Seraing",
+  defenso: "Place George Ista 28, 4030 Liège",
+  venturelab: "Rue des Carmes 24, 4000 Liège",
+};
+
 export const CHALLENGES: Challenge[] = [
   {
     id: 1, position: 1, company: "BNP Paribas Fortis", emoji: "/logos/bnp.png",
     start_time: "08:45", end_time: "09:15",
     location: "Salle Georges Simenon, 4e étage",
-    address: "Place Xavier Neujean 2, 4000 Liège (entrée par le patio)",
+    address: ADDR.bnp,
     challenge_description: "Convaincre un banquier en 3 minutes sans support visuel. Pitch 100% oral.",
     format: "3 min pitch + 2 min Q/A",
     skills: ["Inspirer", "Créer de la valeur", "Exprimer son besoin", "Maîtrise des risques"],
@@ -21,13 +37,15 @@ export const CHALLENGES: Challenge[] = [
     briefing_notes: "Focus sur la plus-value du projet. Chiffres concrets et réels pour le Q/A. Ne pas parler après le passage.",
     jury: ["Katja Makkonen", "Julie Dirick", "Bruno Mazzanti", "Fabian Gasperin"],
     contact_name: "Vincent Louis", contact_phone: "04 74 67 89 34",
-    prize: "1 000 €", transport_to_next: "11 min à pied vers UCM"
+    prize: "1 000 €",
+    transport_to_next: "11 min à pied vers UCM",
+    directions_url: gmaps(ADDR.bnp, ADDR.ucm, "walking"),
   },
   {
     id: 2, position: 2, company: "UCM", emoji: "/logos/ucm.png",
     start_time: "09:45", end_time: "10:15",
     location: "Bureaux UCM – 9e étage",
-    address: "Boulevard d'Avroy 42, 4000 Liège",
+    address: ADDR.ucm,
     challenge_description: "Commande de 100 000 €. Quelles compétences te manquent et comment les intégrer ?",
     format: "3 min pitch + 2 min Q/R",
     skills: ["Auto-évaluation", "Réalisme", "Intégration des compétences"],
@@ -42,13 +60,15 @@ export const CHALLENGES: Challenge[] = [
     briefing_notes: "S'entourer = risque et opportunité. Y penser avant de choisir le moyen.",
     jury: ["Jean-Louis Braibant", "Clémence Lux", "Romane Geurts", "Caroline Scarpulla", "Dominique Reterre", "Marie Tirtiaux"],
     contact_name: "Véronique Jassogne", contact_phone: "04 221 65 57",
-    prize: "1 000 €", transport_to_next: "2 min à pied (même avenue)"
+    prize: "1 000 €",
+    transport_to_next: "2 min à pied (même avenue)",
+    directions_url: gmaps(ADDR.ucm, ADDR.we, "walking"),
   },
   {
     id: 3, position: 3, company: "Wallonie Entreprendre", emoji: "/logos/we.png",
     start_time: "10:30", end_time: "11:00",
     location: "Accueil – panneau WE et sofas",
-    address: "Avenue Maurice Destenay 13, 4000 Liège",
+    address: ADDR.we,
     challenge_description: "Pourquoi la Wallonie doit soutenir ton projet ? Trio : projet – ambition – challenge.",
     format: "3 min trio + 2 min Q/A",
     skills: ["Impact régional", "Clairvoyance", "Concret", "Capter l'attention"],
@@ -62,13 +82,15 @@ export const CHALLENGES: Challenge[] = [
     briefing_notes: "Jury plus dur qu'ailleurs. Trio : projet – ambition – challenge.",
     jury: ["Elea Dormal", "Emilie Neuville", "Jean-François Desguin"],
     contact_name: "Jean-François Desguin", contact_phone: "04 71 69 85 21",
-    prize: "1 000 €", transport_to_next: "Tram T1 → Pont d'Avroy → Petit Paradis (3 arrêts)"
+    prize: "1 000 €",
+    transport_to_next: "Tram T1 → Pont d'Avroy → Petit Paradis (3 arrêts)",
+    directions_url: gmaps(ADDR.we, ADDR.loterie, "transit"),
   },
   {
     id: 4, position: 4, company: "Loterie Nationale", emoji: "/logos/loterie.png",
     start_time: "11:30", end_time: "12:00",
     location: "Hub Liège",
-    address: "Avenue Blonden 84, 4000 Liège",
+    address: ADDR.loterie,
     challenge_description: "Comment le hasard peut-il métamorphoser ton projet ?",
     format: "1 min projet + 2 min hasard + 2 min feedback",
     skills: ["Originalité", "Cohérence", "Innovation", "Clarté"],
@@ -82,13 +104,15 @@ export const CHALLENGES: Challenge[] = [
     briefing_notes: "Passé ou futur. Comment mettre en place la chance. Enregistrement sur place, accessoires OK.",
     jury: ["Maud Neuprez", "Nicolas Van Lierde", "Claudyna Yanez Delgado", "Victoria Baijot"],
     contact_name: "Maud Neuprez", contact_phone: "04 73 94 58 10",
-    prize: "1 000 €", transport_to_next: "LUNCH puis Bus B2 12h19 : Guillemins → Sart-Tilman → 16 min à pied"
+    prize: "1 000 €",
+    transport_to_next: "LUNCH puis Bus B2 12h19 : Guillemins → Sart-Tilman → 16 min à pied",
+    directions_url: gmaps(ADDR.loterie, ADDR.evs, "transit"),
   },
   {
     id: 5, position: 5, company: "EVS", emoji: "/logos/evs.jpg",
     start_time: "13:30", end_time: "14:00",
     location: "Bureaux EVS – Albert's Room",
-    address: "Rue du Bois Saint-Jean 13, 4102 Seraing",
+    address: ADDR.evs,
     challenge_description: "À quel besoin réponds-tu vraiment ? Stratégie marketing digital.",
     format: "1 min besoin + 2 min stratégie digitale",
     skills: ["Compréhension produit", "Segmentation", "IA", "Objectifs clairs", "Marketing digital"],
@@ -103,13 +127,15 @@ export const CHALLENGES: Challenge[] = [
     briefing_notes: "Vérifier que la stratégie est adaptée au challenge, pas juste un exemple passé.",
     jury: ["Justin Mannesberg", "Julien Legras", "Sébastien Mandiaux"],
     contact_name: "Justin Mannesberg", contact_phone: "04 90 58 48 04",
-    prize: "1 000 €", transport_to_next: "Voiture VentureLab (VW Caravelle, chauffeur Robin)"
+    prize: "1 000 €",
+    transport_to_next: "Voiture VentureLab (VW Caravelle, chauffeur Robin)",
+    directions_url: gmaps(ADDR.evs, ADDR.defenso, "driving"),
   },
   {
     id: 6, position: 6, company: "Defenso", emoji: "/logos/defenso.png",
     start_time: "14:30", end_time: "15:00",
     location: "Bureaux Defenso",
-    address: "Place George Ista 28, 4030 Liège",
+    address: ADDR.defenso,
     challenge_description: "3 risques qui peuvent faire échouer ton projet + solutions.",
     format: "1 min projet + 2 min risque + 2 min Q/A jury",
     skills: ["Se projeter", "Anticiper", "Solutions", "Opportunité dans la difficulté"],
@@ -123,13 +149,15 @@ export const CHALLENGES: Challenge[] = [
     briefing_notes: "Face à des avocats. Montrer qu'on anticipe, pas être expert juridique. Fiche à laisser.",
     jury: ["Samuel van Durme", "Sarah Méan", "Benoît Delacroix", "Clémentine Waxweiler"],
     contact_name: "Samuel van Durme", contact_phone: "04 252 74 29",
-    prize: "1 000 €", transport_to_next: "Bus L17 15h19 → Pont de Longdoz → 6 min à pied"
+    prize: "1 000 €",
+    transport_to_next: "Bus L17 15h19 → Pont de Longdoz → 6 min à pied",
+    directions_url: gmaps(ADDR.defenso, ADDR.venturelab, "transit"),
   },
   {
     id: 7, position: 7, company: "AKT CCI", emoji: "/logos/akt.png",
     start_time: "16:00", end_time: "16:30",
     location: "VentureLab – Salle des Métamorphoses (RDC)",
-    address: "Rue des Carmes 24, 4000 Liège",
+    address: ADDR.venturelab,
     challenge_description: "King du Networking : 15 min de networking réel avec des entrepreneurs.",
     format: "15 min networking + 1,5 min feedback",
     skills: ["Networking", "Approche pro", "Adaptation"],
@@ -143,13 +171,15 @@ export const CHALLENGES: Challenge[] = [
     briefing_notes: "Être bon connecteur. Apporter à son réseau, pas parler de soi.",
     jury: ["Personnes mystères"],
     contact_name: "Céline Kuetgens", contact_phone: "04 99 13 80 89",
-    prize: "1 000 €", transport_to_next: "Porte à côté (même bâtiment)"
+    prize: "1 000 €",
+    transport_to_next: "Porte à côté (même bâtiment)",
+    directions_url: null,
   },
   {
     id: 8, position: 8, company: "VEDIA", emoji: "/logos/vedia.png",
     start_time: "16:30", end_time: "17:00",
     location: "VentureLab – Salle des Créations (1er étage)",
-    address: "Rue des Carmes 24, 4000 Liège",
+    address: ADDR.venturelab,
     challenge_description: "Plateau TV : carte mauvaise nouvelle + pitch face caméra 1m30.",
     format: "60s lecture + 4 min prépa + 1m30 face caméra",
     skills: ["Résilience", "Conviction", "Authenticité", "Gestion du stress"],
@@ -163,7 +193,9 @@ export const CHALLENGES: Challenge[] = [
     briefing_notes: "Enregistrement sur place. Peuvent s'entraîner et prendre des accessoires.",
     jury: ["Quentin Boniver", "Sandro Giarratana"],
     contact_name: "Quentin Boniver", contact_phone: "04 99 10 77 68",
-    prize: "1 000 €", transport_to_next: "Déjà au VentureLab → clôture à 18h00"
+    prize: "1 000 €",
+    transport_to_next: "Déjà au VentureLab → clôture à 18h00",
+    directions_url: null,
   }
 ];
 

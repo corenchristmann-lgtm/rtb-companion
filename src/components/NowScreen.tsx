@@ -240,6 +240,12 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
         <div className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Prochain transport</p>
           <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.transport_to_next}</p>
+          {ch.directions_url && (
+            <a href={ch.directions_url} target="_blank" rel="noopener noreferrer"
+              className="mt-2.5 flex items-center justify-center gap-2 h-11 bg-[#7A4AED] text-white rounded-xl text-sm font-semibold shadow-sm shadow-[#7A4AED]/20 active:scale-95 transition-transform">
+              <span>📍</span> Ouvrir dans Google Maps
+            </a>
+          )}
         </div>
       )}
 

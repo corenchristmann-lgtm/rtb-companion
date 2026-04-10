@@ -73,7 +73,16 @@ export function PlanningScreen({ timer, focusId, onClearFocus }: Props) {
                     </div>
                     <p className="text-[11px] text-muted-foreground mt-0.5">{ch.format}</p>
                     {!expanded && ch.transport_to_next && i < CHALLENGES.length - 1 && (
-                      <p className="text-[10px] text-gray-300 mt-1 truncate">→ {ch.transport_to_next}</p>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <p className="text-[10px] text-gray-300 flex-1 truncate">→ {ch.transport_to_next}</p>
+                        {ch.directions_url && (
+                          <a href={ch.directions_url} target="_blank" rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[9px] font-semibold text-[#7A4AED] bg-[#F3F0FA] px-1.5 py-0.5 rounded shrink-0">
+                            Maps
+                          </a>
+                        )}
+                      </div>
                     )}
                   </div>
                 </button>
@@ -171,6 +180,12 @@ function ChallengeInfo({ ch }: { ch: Challenge }) {
         <div className="rounded-xl bg-[#F3F0FA] p-3">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5">Transport</p>
           <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.transport_to_next}</p>
+          {ch.directions_url && (
+            <a href={ch.directions_url} target="_blank" rel="noopener noreferrer"
+              className="mt-2 flex items-center justify-center gap-2 h-10 bg-[#7A4AED] text-white rounded-lg text-xs font-semibold active:scale-95 transition-transform">
+              📍 Ouvrir dans Google Maps
+            </a>
+          )}
         </div>
       )}
     </div>

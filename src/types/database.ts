@@ -17,6 +17,7 @@ export interface Challenge {
   contact_phone: string | null;
   prize: string;
   transport_to_next: string | null;
+  directions_url: string | null;
 }
 
 export interface Project {
