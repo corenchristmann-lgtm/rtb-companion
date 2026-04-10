@@ -1,26 +1,38 @@
 import sharp from "sharp";
-import { readFileSync, writeFileSync } from "fs";
-
-// VentureLab brandmark — purple circle with kite
-// We'll create a simple purple icon with "RTB" text as SVG, then convert
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#7A4AED"/>
-  <text x="256" y="290" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="180" fill="white">RTB</text>
-  <text x="256" y="380" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="600" font-size="60" fill="white" opacity="0.7">VentureLab</text>
-</svg>`;
-
-const svgBuffer = Buffer.from(svg);
-
-// Generate PWA icons
-await sharp(svgBuffer).resize(512, 512).png().toFile("public/icon-512.png");
-await sharp(svgBuffer).resize(192, 192).png().toFile("public/icon-192.png");
-await sharp(svgBuffer).resize(180, 180).png().toFile("public/apple-touch-icon.png");
-
-// Generate favicon (32x32 PNG, Next.js 14+ supports PNG favicons)
-await sharp(svgBuffer).resize(32, 32).png().toFile("src/app/icon.png");
-
-// Remove old .ico
 import { unlinkSync } from "fs";
+
+// VentureLab brandmark on pink background (#FFF5F7)
+const brandmark = "public/logos/brandmark.png";
+
+async function generate(size, output) {
+  // Create pink background with brandmark centered (with padding)
+  const padding = Math.round(size * 0.12);
+  const logoSize = size - padding * 2;
+
+  const resizedLogo = await sharp(brandmark)
+    .resize(logoSize, logoSize, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .toBuffer();
+
+  await sharp({
+    create: {
+      width: size,
+      height: size,
+      channels: 4,
+      background: { r: 255, g: 245, b: 247, alpha: 255 }, // #FFF5F7
+    },
+  })
+    .composite([{ input: resizedLogo, gravity: "centre" }])
+    .png()
+    .toFile(output);
+
+  console.log(`✓ ${output} (${size}x${size})`);
+}
+
+await generate(512, "public/icon-512.png");
+await generate(192, "public/icon-192.png");
+await generate(180, "public/apple-touch-icon.png");
+await generate(32, "src/app/icon.png");
+
 try { unlinkSync("src/app/favicon.ico"); } catch {}
 
-console.log("✓ Icons generated: icon-512, icon-192, apple-touch-icon, favicon");
+console.log("Done!");
