@@ -133,24 +133,29 @@ export function MapScreen({ currentTeamId }: Props) {
 
   const activeTeamId = selectedTeam ?? currentTeamId;
 
-  // Create DivIcon for team labels
+  // Create DivIcon: pulsing colored dot with team number
   function teamIcon(pos: TeamPosition, isActive: boolean) {
-    const label = pos.teamName.replace("Équipe ", "Éq. ");
+    const num = pos.teamId;
+    const size = isActive ? 28 : 22;
     return new L!.DivIcon({
       className: "",
       html: `<div style="
+        width: ${size}px; height: ${size}px;
         background: ${pos.color};
-        color: white;
-        font-size: ${isActive ? "11px" : "10px"};
-        font-weight: 700;
-        padding: 3px 8px;
-        border-radius: 12px;
-        white-space: nowrap;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         border: 2px solid white;
+        border-radius: 50%;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: ${isActive ? "11px" : "9px"}; font-weight: 800;
         transform: translate(-50%, -50%);
-        ${isActive ? "font-size: 12px; padding: 4px 10px;" : ""}
-      ">${label}</div>`,
+        animation: teamPulse 2s ease-in-out infinite;
+      ">${num}</div>
+      <style>
+        @keyframes teamPulse {
+          0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${pos.color}40; }
+          50% { opacity: 0.85; box-shadow: 0 0 0 6px ${pos.color}00; }
+        }
+      </style>`,
       iconSize: [0, 0],
       iconAnchor: [0, 0],
     });
