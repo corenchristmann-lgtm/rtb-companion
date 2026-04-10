@@ -195,8 +195,8 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
       {/* Top buttons */}
       <div className="absolute top-4 right-4 z-10 flex gap-2" onClick={(e) => e.stopPropagation()}>
         <button onClick={downloadPhoto}
-          className="w-10 h-10 rounded-full bg-white/15 text-white text-lg flex items-center justify-center active:scale-90 transition-transform">
-          ⬇
+          className="w-8 h-8 rounded-full bg-white/10 text-white/60 text-xs flex items-center justify-center active:scale-90 transition-transform">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
         <button onClick={onClose}
           className="w-10 h-10 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center">
