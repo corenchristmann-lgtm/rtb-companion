@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { TEAMS } from "@/lib/teams";
 import { LOCATIONS, ATELIER_TO_LOCATION, TEAM_COLORS, LIEGE_CENTER, DEFAULT_ZOOM } from "@/lib/mapData";
+import { loadAllRoutes, interpolateAlongRoute } from "@/lib/routes";
+import type { RoutesMap } from "@/lib/routes";
 
 const MapContainer = dynamic(() => import("react-leaflet").then(m => m.MapContainer), { ssr: false });
 const TileLayer = dynamic(() => import("react-leaflet").then(m => m.TileLayer), { ssr: false });
@@ -26,7 +28,7 @@ interface TeamPosition {
   status: string;
 }
 
-function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number): TeamPosition {
+function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number, routes: RoutesMap): TeamPosition {
   const color = TEAM_COLORS[(team.id - 1) % TEAM_COLORS.length];
 
   for (let i = 0; i < team.schedule.length; i++) {
@@ -36,14 +38,17 @@ function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number): TeamPositio
     const start = timeToSeconds(slot.start_time);
     const end = timeToSeconds(slot.end_time);
 
+    // Before first challenge
     if (i === 0 && nowSeconds < start) {
       return { teamId: team.id, teamName: team.name, color, lat: loc.lat, lng: loc.lng, status: `En attente — ${loc.company}` };
     }
 
+    // During this challenge
     if (nowSeconds >= start && nowSeconds < end) {
       return { teamId: team.id, teamName: team.name, color, lat: loc.lat, lng: loc.lng, status: `Chez ${loc.company}` };
     }
 
+    // In transit to next
     if (i < team.schedule.length - 1) {
       const nextSlot = team.schedule[i + 1];
       const nextLocId = ATELIER_TO_LOCATION[nextSlot.atelier_id];
@@ -52,6 +57,16 @@ function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number): TeamPositio
 
       if (nowSeconds >= end && nowSeconds < nextStart) {
         const progress = (nowSeconds - end) / (nextStart - end);
+
+        // Use real route if available
+        const routeKey = `${locId}->${nextLocId}`;
+        const route = routes[routeKey];
+        if (route && route.length > 1) {
+          const [lat, lng] = interpolateAlongRoute(route, progress);
+          return { teamId: team.id, teamName: team.name, color, lat, lng, status: `En route vers ${nextLoc.company}` };
+        }
+
+        // Fallback: linear interpolation
         const lat = loc.lat + (nextLoc.lat - loc.lat) * progress;
         const lng = loc.lng + (nextLoc.lng - loc.lng) * progress;
         return { teamId: team.id, teamName: team.name, color, lat, lng, status: `En route vers ${nextLoc.company}` };
@@ -59,6 +74,7 @@ function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number): TeamPositio
     }
   }
 
+  // After last challenge
   const lastSlot = team.schedule[team.schedule.length - 1];
   const lastLocId = ATELIER_TO_LOCATION[lastSlot.atelier_id];
   const lastLoc = LOCATIONS[lastLocId];
@@ -72,6 +88,8 @@ interface Props {
 export function MapScreen({ currentTeamId }: Props) {
   const [leafletReady, setLeafletReady] = useState(false);
   const [L, setL] = useState<typeof import("leaflet") | null>(null);
+  const [routes, setRoutes] = useState<RoutesMap>({});
+  const [routesLoaded, setRoutesLoaded] = useState(false);
   const [positions, setPositions] = useState<TeamPosition[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
 
@@ -97,7 +115,15 @@ export function MapScreen({ currentTeamId }: Props) {
     return () => { document.head.removeChild(link); };
   }, []);
 
-  // Update positions
+  // Load OSRM routes (cached in localStorage)
+  useEffect(() => {
+    loadAllRoutes().then((r) => {
+      setRoutes(r);
+      setRoutesLoaded(true);
+    });
+  }, []);
+
+  // Update positions every 30s
   const updatePositions = useCallback(() => {
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -114,8 +140,8 @@ export function MapScreen({ currentTeamId }: Props) {
     }
 
     const nowSec = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
-    setPositions(TEAMS.map((t) => getTeamPosition(t, nowSec)));
-  }, []);
+    setPositions(TEAMS.map((t) => getTeamPosition(t, nowSec, routes)));
+  }, [routes]);
 
   useEffect(() => {
     updatePositions();
@@ -133,7 +159,6 @@ export function MapScreen({ currentTeamId }: Props) {
 
   const activeTeamId = selectedTeam ?? currentTeamId;
 
-  // Create DivIcon: pulsing colored dot with team number
   function teamIcon(pos: TeamPosition, isActive: boolean) {
     const num = pos.teamId;
     const size = isActive ? 28 : 22;
@@ -190,7 +215,10 @@ export function MapScreen({ currentTeamId }: Props) {
         return (
           <div className="px-4 pb-2">
             <div className="rounded-xl px-3 py-2 text-center" style={{ backgroundColor: pos.color + "15" }}>
-              <p className="text-xs font-semibold" style={{ color: pos.color }}>{pos.teamName} — {pos.status}</p>
+              <p className="text-xs font-semibold" style={{ color: pos.color }}>
+                {pos.teamName} — {pos.status}
+                {!routesLoaded && " (chargement itineraires...)"}
+              </p>
             </div>
           </div>
         );
@@ -215,7 +243,7 @@ export function MapScreen({ currentTeamId }: Props) {
             </Marker>
           ))}
 
-          {/* Team position labels */}
+          {/* Team position dots */}
           {positions.map((pos) => {
             const isActive = pos.teamId === activeTeamId;
             return (
