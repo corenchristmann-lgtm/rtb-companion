@@ -162,6 +162,24 @@ export function GalleryScreen({ teamName }: Props) {
 function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: string; onClose: () => void }) {
   const { reactions, addReaction } = usePhotoReactions(photo.id);
 
+  const downloadPhoto = async () => {
+    try {
+      const res = await fetch(photo.url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `rtb-photo-${photo.id}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      // Fallback: open in new tab
+      window.open(photo.url, "_blank");
+    }
+  };
+
   // Group reactions by emoji: { "🔥": { count: 3, myTeam: true } }
   const grouped = REACTION_EMOJIS.map((emoji) => {
     const matching = reactions.filter((r) => r.emoji === emoji);
@@ -176,10 +194,10 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
     <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center" onClick={onClose}>
       {/* Top buttons */}
       <div className="absolute top-4 right-4 z-10 flex gap-2" onClick={(e) => e.stopPropagation()}>
-        <a href={photo.url} download target="_blank" rel="noopener noreferrer"
+        <button onClick={downloadPhoto}
           className="w-10 h-10 rounded-full bg-white/15 text-white text-lg flex items-center justify-center active:scale-90 transition-transform">
           ⬇
-        </a>
+        </button>
         <button onClick={onClose}
           className="w-10 h-10 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center">
           ✕
