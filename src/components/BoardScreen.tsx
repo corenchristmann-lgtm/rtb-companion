@@ -53,18 +53,17 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Image src="/logos/venturelab.svg" alt="VentureLab" width={100} height={33} unoptimized />
-        </div>
-        <button onClick={onLogout} className="text-[11px] text-[#7C6FA0] underline">
-          Changer d'équipe
+      <div className="relative">
+        <button onClick={onLogout} className="absolute right-0 top-1 text-[11px] text-[#7C6FA0] underline">
+          Changer d'equipe
         </button>
-      </div>
-
-      <div className="text-center">
-        <h1 className="text-lg font-bold text-[#1A1035]">Road-to-Business</h1>
-        <p className="text-xs text-[#7C6FA0] mt-0.5">{team.name} · {team.accompanist}</p>
+        <div className="flex justify-center">
+          <Image src="/logos/venturelab.svg" alt="VentureLab" width={140} height={46} unoptimized />
+        </div>
+        <div className="text-center mt-2">
+          <h1 className="text-lg font-bold text-[#1A1035]">Road-to-Business</h1>
+          <p className="text-xs text-[#7C6FA0] mt-0.5">{team.name} · {team.accompanist}</p>
+        </div>
       </div>
 
       {/* Countdown / Status */}

@@ -173,7 +173,7 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center" onClick={onClose}>
       {/* Close button */}
       <button onClick={onClose}
         className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center">
@@ -181,12 +181,10 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
       </button>
 
       {/* Photo */}
-      <div className="flex-1 flex items-center justify-center p-4" onClick={onClose}>
-        <img src={photo.url} alt="" className="max-w-full max-h-[60vh] object-contain rounded-lg" />
-      </div>
+      <img src={photo.url} alt="" className="max-w-[90%] max-h-[50vh] object-contain rounded-lg" onClick={onClose} />
 
       {/* Caption + team */}
-      <div className="text-center -mt-2 mb-3 px-4">
+      <div className="text-center mt-3 px-4">
         {photo.team_name && (
           <p className="text-xs text-white/50">{photo.team_name}</p>
         )}
@@ -195,8 +193,8 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
         )}
       </div>
 
-      {/* Emoji reactions */}
-      <div className="px-4 pb-6" onClick={(e) => e.stopPropagation()}>
+      {/* Emoji reactions — centered under photo */}
+      <div className="mt-4 px-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-center gap-2">
           {grouped.map(({ emoji, count, myTeam }) => (
             <button key={emoji} onClick={() => addReaction(emoji, teamName)}
