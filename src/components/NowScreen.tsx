@@ -22,6 +22,7 @@ interface Props {
   challenges: Challenge[];
   team: Team;
   onOpenChallenge: (id: number) => void;
+  onOpenGallery: () => void;
   onLogout: () => void;
 }
 
@@ -30,7 +31,7 @@ function mapsLink(address: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
 
-export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }: Props) {
+export function NowScreen({ timer, challenges, team, onOpenChallenge, onOpenGallery, onLogout }: Props) {
   const ch = challenges[timer.currentChallengeIndex];
   const [panel, setPanel] = useState<"none" | "tips" | "checklist">("none");
   if (!ch) return null;
@@ -202,6 +203,12 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
           </a>
         ) : <div />}
       </div>
+
+      {/* Gallery button */}
+      <button onClick={onOpenGallery}
+        className="w-full h-12 rounded-2xl bg-[#7A4AED] text-white text-sm font-semibold active:scale-95 transition-transform shadow-md shadow-[#7A4AED]/25">
+        Galerie Photos
+      </button>
 
       {/* Panels */}
       {panel === "tips" && (

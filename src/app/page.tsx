@@ -62,7 +62,7 @@ export default function Home() {
     <div className="flex flex-col h-dvh">
       <main className="flex-1 overflow-y-auto pb-[68px]">
         <div key={tab} className={direction === "left" ? "animate-slide-left" : direction === "right" ? "animate-slide-right" : "animate-fade-in"}>
-          {tab === "now" && <NowScreen timer={timer} challenges={challenges} team={team} onOpenChallenge={openChallenge} onLogout={logout} />}
+          {tab === "now" && <NowScreen timer={timer} challenges={challenges} team={team} onOpenChallenge={openChallenge} onOpenGallery={() => { setTab("projects"); setShowGallery(true); }} onLogout={logout} />}
           {tab === "planning" && <PlanningScreen timer={timer} challenges={challenges} focusId={focusChallengeId} onClearFocus={() => setFocusChallengeId(null)} />}
           {tab === "score" && <ScoreScreen timer={timer} challenges={challenges} projects={team.projects} />}
           {tab === "projects" && !showGallery && <ProjectsScreen challenges={challenges} projects={team.projects} team={team} onOpenGallery={() => setShowGallery(true)} />}
