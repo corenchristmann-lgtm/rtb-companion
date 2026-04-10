@@ -174,11 +174,17 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
 
   return (
     <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center" onClick={onClose}>
-      {/* Close button */}
-      <button onClick={onClose}
-        className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center">
-        ✕
-      </button>
+      {/* Top buttons */}
+      <div className="absolute top-4 right-4 z-10 flex gap-2" onClick={(e) => e.stopPropagation()}>
+        <a href={photo.url} download target="_blank" rel="noopener noreferrer"
+          className="w-10 h-10 rounded-full bg-white/15 text-white text-lg flex items-center justify-center active:scale-90 transition-transform">
+          ⬇
+        </a>
+        <button onClick={onClose}
+          className="w-10 h-10 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center">
+          ✕
+        </button>
+      </div>
 
       {/* Photo */}
       <img src={photo.url} alt="" className="max-w-[90%] max-h-[50vh] object-contain rounded-lg" onClick={onClose} />
