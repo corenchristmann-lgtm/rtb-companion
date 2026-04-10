@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getSupabase } from "@/lib/supabase";
 import type { ChecklistItem, Note } from "@/types/database";
-import { DEFAULT_CHECKLIST } from "@/lib/data";
+import { DEFAULT_CHECKLIST } from "@/lib/teams";
 
 // ---- Checklist ----
 export function useChecklist(challengeId: number) {
@@ -137,19 +137,20 @@ export function useAllChecklistProgress() {
 }
 
 // ---- Initialize checklist items if empty ----
+const ATELIER_DB_ID: Record<string, number> = {
+  bnp: 1, ucm: 2, we: 3, loterie: 4, evs: 5, defenso: 6, akt: 7, vedia: 8,
+};
+
 export async function initializeChecklistIfEmpty() {
   const { data, error } = await getSupabase().from("checklist_items").select("id").limit(1);
   if (error || (data && data.length > 0)) return;
 
   const items: { challenge_id: number; label: string; is_checked: boolean; is_custom: boolean }[] = [];
-  for (const [challengeId, labels] of Object.entries(DEFAULT_CHECKLIST)) {
+  for (const [atelierId, labels] of Object.entries(DEFAULT_CHECKLIST)) {
+    const dbId = ATELIER_DB_ID[atelierId];
+    if (!dbId) continue;
     for (const label of labels) {
-      items.push({
-        challenge_id: parseInt(challengeId),
-        label,
-        is_checked: false,
-        is_custom: false,
-      });
+      items.push({ challenge_id: dbId, label, is_checked: false, is_custom: false });
     }
   }
   await getSupabase().from("checklist_items").insert(items);

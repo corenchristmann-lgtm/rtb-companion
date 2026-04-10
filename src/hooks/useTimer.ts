@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { CHALLENGES } from "@/lib/data";
 import type { ChallengeStatusType } from "@/types/database";
 
-// Date de l'événement RTB — lundi 13 avril 2026
 const EVENT_DATE = "2026-04-13";
+
+interface ChallengeInput {
+  start_time: string;
+  end_time: string;
+}
 
 interface TimerState {
   currentChallengeIndex: number;
@@ -17,75 +20,50 @@ interface TimerState {
   daysUntilEvent: number;
 }
 
-function timeToSeconds(timeStr: string): number {
-  const [hours, minutes] = timeStr.split(":").map(Number);
-  return hours * 3600 + minutes * 60;
+function timeToSeconds(t: string): number {
+  const [h, m] = t.split(":").map(Number);
+  return h * 3600 + m * 60;
 }
 
-function getSecondsFromMidnight(date: Date): number {
-  return date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
+function getSecondsFromMidnight(d: Date): number {
+  return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
 }
 
 function isToday(dateStr: string): boolean {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
+  const n = new Date();
+  const y = n.getFullYear(), m = String(n.getMonth() + 1).padStart(2, "0"), d = String(n.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}` === dateStr;
 }
 
 function daysUntil(dateStr: string): number {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const target = new Date(dateStr + "T00:00:00");
-  return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  const n = new Date(); n.setHours(0, 0, 0, 0);
+  return Math.ceil((new Date(dateStr + "T00:00:00").getTime() - n.getTime()) / 86400000);
 }
 
-export function useTimer() {
+export function useTimer(challenges: ChallengeInput[]) {
   const [state, setState] = useState<TimerState>({
-    currentChallengeIndex: 0,
-    status: "upcoming",
-    remainingSeconds: 0,
-    progressPercent: 0,
-    label: "",
-    isEventDay: false,
-    daysUntilEvent: 0,
+    currentChallengeIndex: 0, status: "upcoming", remainingSeconds: 0,
+    progressPercent: 0, label: "", isEventDay: false, daysUntilEvent: 0,
   });
   const [manualOverride, setManualOverride] = useState<number | null>(null);
   const alertedRef = useRef<Set<string>>(new Set());
 
-  const vibrate = useCallback((pattern: number[]) => {
-    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-      navigator.vibrate(pattern);
-    }
+  const vibrate = useCallback((p: number[]) => {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(p);
   }, []);
-
-  const triggerAlert = useCallback((key: string, pattern: number[]) => {
-    if (!alertedRef.current.has(key)) {
-      alertedRef.current.add(key);
-      vibrate(pattern);
-    }
+  const triggerAlert = useCallback((key: string, p: number[]) => {
+    if (!alertedRef.current.has(key)) { alertedRef.current.add(key); vibrate(p); }
   }, [vibrate]);
-
-  const goToChallenge = useCallback((index: number) => {
-    setManualOverride(index);
-    alertedRef.current.clear();
-  }, []);
-
+  const goToChallenge = useCallback((i: number) => { setManualOverride(i); alertedRef.current.clear(); }, []);
   const goNext = useCallback(() => {
-    const current = manualOverride ?? state.currentChallengeIndex;
-    if (current < CHALLENGES.length - 1) goToChallenge(current + 1);
-  }, [manualOverride, state.currentChallengeIndex, goToChallenge]);
-
+    const c = manualOverride ?? state.currentChallengeIndex;
+    if (c < challenges.length - 1) goToChallenge(c + 1);
+  }, [manualOverride, state.currentChallengeIndex, challenges.length, goToChallenge]);
   const goPrev = useCallback(() => {
-    const current = manualOverride ?? state.currentChallengeIndex;
-    if (current > 0) goToChallenge(current - 1);
+    const c = manualOverride ?? state.currentChallengeIndex;
+    if (c > 0) goToChallenge(c - 1);
   }, [manualOverride, state.currentChallengeIndex, goToChallenge]);
-
-  const resetToAuto = useCallback(() => {
-    setManualOverride(null);
-    alertedRef.current.clear();
-  }, []);
+  const resetToAuto = useCallback(() => { setManualOverride(null); alertedRef.current.clear(); }, []);
 
   useEffect(() => {
     function tick() {
@@ -96,124 +74,68 @@ export function useTimer() {
 
       let idx = manualOverride ?? 0;
       let status: ChallengeStatusType = "upcoming";
-      let remainingSeconds = 0;
-      let progressPercent = 0;
-      let label = "";
+      let remainingSeconds = 0, progressPercent = 0, label = "";
 
-      // Before event day and no manual override: show countdown to event
       if (!eventDay && manualOverride === null) {
-        idx = 0;
-        status = "upcoming";
-        remainingSeconds = 0;
-        progressPercent = 0;
-        if (days > 0) {
-          label = days === 1 ? "C'est demain !" : `J-${days} avant le RTB`;
-        } else {
-          label = "Le RTB est passé";
-        }
-        setState({ currentChallengeIndex: idx, status, remainingSeconds, progressPercent, label, isEventDay: eventDay, daysUntilEvent: days });
+        label = days > 0 ? (days === 1 ? "C'est demain !" : `J-${days} avant le RTB`) : "Le RTB est passé";
+        setState({ currentChallengeIndex: 0, status: "upcoming", remainingSeconds: 0, progressPercent: 0, label, isEventDay: false, daysUntilEvent: days });
         return;
       }
 
       if (manualOverride !== null) {
         idx = manualOverride;
-        const ch = CHALLENGES[idx];
-        const startSec = timeToSeconds(ch.start_time);
-        const endSec = timeToSeconds(ch.end_time);
-        const duration = endSec - startSec;
-
-        if (eventDay && nowSec < startSec) {
-          status = "in_transit";
-          remainingSeconds = startSec - nowSec;
-          label = `Départ dans ${formatTime(remainingSeconds)}`;
-        } else if (eventDay && nowSec < endSec) {
-          status = "active";
-          remainingSeconds = endSec - nowSec;
-          progressPercent = ((nowSec - startSec) / duration) * 100;
-          label = `${formatTime(remainingSeconds)} restantes`;
-        } else {
-          status = eventDay ? "completed" : "upcoming";
-          remainingSeconds = 0;
-          progressPercent = eventDay ? 100 : 0;
-          label = eventDay ? "Terminé" : `Aperçu : ${ch.company}`;
-        }
+        const ch = challenges[idx];
+        const s = timeToSeconds(ch.start_time), e = timeToSeconds(ch.end_time);
+        if (eventDay && nowSec < s) { status = "in_transit"; remainingSeconds = s - nowSec; label = `Départ dans ${formatTime(remainingSeconds)}`; }
+        else if (eventDay && nowSec < e) { status = "active"; remainingSeconds = e - nowSec; progressPercent = ((nowSec - s) / (e - s)) * 100; label = `${formatTime(remainingSeconds)} restantes`; }
+        else { status = eventDay ? "completed" : "upcoming"; label = eventDay ? "Terminé" : `Aperçu`; progressPercent = eventDay ? 100 : 0; }
       } else {
-        // Auto-detect on event day
         let found = false;
-        for (let i = 0; i < CHALLENGES.length; i++) {
-          const ch = CHALLENGES[i];
-          const startSec = timeToSeconds(ch.start_time);
-          const endSec = timeToSeconds(ch.end_time);
-
-          if (nowSec < startSec) {
-            idx = i;
-            status = "in_transit";
-            remainingSeconds = startSec - nowSec;
-            label = `Début dans ${formatTime(remainingSeconds)}`;
-            found = true;
-
+        for (let i = 0; i < challenges.length; i++) {
+          const ch = challenges[i];
+          const s = timeToSeconds(ch.start_time), e = timeToSeconds(ch.end_time);
+          if (nowSec < s) {
+            idx = i; status = "in_transit"; remainingSeconds = s - nowSec;
+            label = `Début dans ${formatTime(remainingSeconds)}`; found = true;
             if (remainingSeconds <= 300) triggerAlert(`pre-${i}`, [200, 100, 200, 100, 200]);
             break;
-          } else if (nowSec >= startSec && nowSec < endSec) {
-            idx = i;
-            status = "active";
-            remainingSeconds = endSec - nowSec;
-            progressPercent = ((nowSec - startSec) / (endSec - startSec)) * 100;
-            label = `${formatTime(remainingSeconds)} restantes`;
-            found = true;
-
+          } else if (nowSec < e) {
+            idx = i; status = "active"; remainingSeconds = e - nowSec;
+            progressPercent = ((nowSec - s) / (e - s)) * 100;
+            label = `${formatTime(remainingSeconds)} restantes`; found = true;
             triggerAlert(`start-${i}`, [500, 200, 500]);
             if (remainingSeconds <= 300) triggerAlert(`warn-${i}`, [200, 100, 200, 100, 200, 100, 200]);
             if (remainingSeconds <= 60) triggerAlert(`urgent-${i}`, [500, 200, 500, 200, 500]);
             break;
           }
         }
-
         if (!found) {
-          if (nowSec >= timeToSeconds(CHALLENGES[CHALLENGES.length - 1].end_time)) {
-            idx = CHALLENGES.length - 1;
-            status = "completed";
-            label = "Journée terminée !";
-            progressPercent = 100;
+          if (nowSec >= timeToSeconds(challenges[challenges.length - 1].end_time)) {
+            idx = challenges.length - 1; status = "completed"; label = "Journée terminée !"; progressPercent = 100;
           } else {
-            idx = 0;
-            status = "upcoming";
-            remainingSeconds = timeToSeconds(CHALLENGES[0].start_time) - nowSec;
+            idx = 0; status = "upcoming"; remainingSeconds = timeToSeconds(challenges[0].start_time) - nowSec;
             label = `Début dans ${formatTime(remainingSeconds)}`;
           }
         }
       }
-
       setState({ currentChallengeIndex: idx, status, remainingSeconds, progressPercent, label, isEventDay: eventDay, daysUntilEvent: days });
     }
-
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [manualOverride, triggerAlert]);
+  }, [manualOverride, triggerAlert, challenges]);
 
   return {
     ...state,
-    challenge: CHALLENGES[state.currentChallengeIndex],
     isManualOverride: manualOverride !== null,
-    goNext,
-    goPrev,
-    goToChallenge,
-    resetToAuto,
-    completedCount: getCompletedCount(state.currentChallengeIndex, state.status),
+    goNext, goPrev, goToChallenge, resetToAuto,
+    completedCount: state.status === "completed" ? state.currentChallengeIndex + 1 : state.currentChallengeIndex,
   };
-}
-
-function getCompletedCount(currentIndex: number, status: ChallengeStatusType): number {
-  if (status === "completed") return currentIndex + 1;
-  return currentIndex;
 }
 
 export function formatTime(totalSeconds: number): string {
   if (totalSeconds <= 0) return "0:00";
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  if (hours > 0) return `${hours}h${minutes.toString().padStart(2, "0")}`;
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  const h = Math.floor(totalSeconds / 3600), m = Math.floor((totalSeconds % 3600) / 60), s = totalSeconds % 60;
+  if (h > 0) return `${h}h${m.toString().padStart(2, "0")}`;
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }
