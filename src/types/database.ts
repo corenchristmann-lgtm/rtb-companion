@@ -47,6 +47,15 @@ export interface Note {
   updated_at: string;
 }
 
+export interface Photo {
+  id: number;
+  url: string;
+  caption: string | null;
+  team_name: string | null;
+  uploaded_by: string | null;
+  created_at: string;
+}
+
 export type ChallengeStatusType = "upcoming" | "in_transit" | "active" | "completed";
 
 export interface ChallengeStatus {

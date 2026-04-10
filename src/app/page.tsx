@@ -5,6 +5,7 @@ import { NowScreen } from "@/components/NowScreen";
 import { PlanningScreen } from "@/components/PlanningScreen";
 import { ScoreScreen } from "@/components/ScoreScreen";
 import { ProjectsScreen } from "@/components/ProjectsScreen";
+import { GalleryScreen } from "@/components/GalleryScreen";
 import { BottomNav } from "@/components/BottomNav";
 import { TeamSelector } from "@/components/TeamSelector";
 import { useTeam, teamChallenges } from "@/hooks/useTeam";
@@ -19,6 +20,7 @@ export default function Home() {
   const [tab, setTab] = useState<Tab>("now");
   const [focusChallengeId, setFocusChallengeId] = useState<number | null>(null);
   const [direction, setDirection] = useState<"left" | "right" | "none">("none");
+  const [showGallery, setShowGallery] = useState(false);
 
   const challenges = useMemo(() => team ? teamChallenges(team) : [], [team]);
   const timer = useTimer(challenges);
@@ -47,6 +49,7 @@ export default function Home() {
     const toIdx = TAB_ORDER.indexOf(t);
     setDirection(toIdx > fromIdx ? "left" : toIdx < fromIdx ? "right" : "none");
     setTab(t);
+    setShowGallery(false);
     if (t !== "planning") setFocusChallengeId(null);
   };
 
@@ -62,7 +65,8 @@ export default function Home() {
           {tab === "now" && <NowScreen timer={timer} challenges={challenges} team={team} onOpenChallenge={openChallenge} onLogout={logout} />}
           {tab === "planning" && <PlanningScreen timer={timer} challenges={challenges} focusId={focusChallengeId} onClearFocus={() => setFocusChallengeId(null)} />}
           {tab === "score" && <ScoreScreen timer={timer} challenges={challenges} projects={team.projects} />}
-          {tab === "projects" && <ProjectsScreen challenges={challenges} projects={team.projects} team={team} />}
+          {tab === "projects" && !showGallery && <ProjectsScreen challenges={challenges} projects={team.projects} team={team} onOpenGallery={() => setShowGallery(true)} />}
+          {tab === "projects" && showGallery && <GalleryScreen teamName={team.name} onBack={() => setShowGallery(false)} />}
         </div>
       </main>
       <BottomNav active={tab} onChange={changeTab} unscoredBadge={unscoredCount} />

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getSupabase } from "@/lib/supabase";
-import type { ChecklistItem, Note } from "@/types/database";
+import type { ChecklistItem, Note, Photo } from "@/types/database";
 import { DEFAULT_CHECKLIST } from "@/lib/teams";
 
 // ── Offline helpers ──
@@ -120,6 +120,47 @@ export function useAllNotes() {
     return () => clearInterval(interval);
   }, []);
   return notes;
+}
+
+// ── Photos (shared gallery) ──
+export function usePhotos() {
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  const fetchPhotos = useCallback(async () => {
+    try {
+      const { data } = await getSupabase().from("photos").select("*").order("created_at", { ascending: false });
+      if (data) { setPhotos(data as Photo[]); lsSet("rtb-photos", data); setLoading(false); return; }
+    } catch {}
+    setPhotos(lsGet("rtb-photos", []));
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchPhotos();
+    const interval = setInterval(fetchPhotos, 15000);
+    return () => clearInterval(interval);
+  }, [fetchPhotos]);
+
+  const uploadPhoto = useCallback(async (file: File, teamName: string) => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: uploadErr } = await getSupabase().storage.from("photos").upload(path, file, { contentType: file.type });
+      if (uploadErr) throw uploadErr;
+      const { data: urlData } = getSupabase().storage.from("photos").getPublicUrl(path);
+      const url = urlData.publicUrl;
+      const { data } = await getSupabase().from("photos").insert({ url, team_name: teamName }).select().single();
+      if (data) setPhotos(prev => [data as Photo, ...prev]);
+    } catch (err) {
+      console.error("Photo upload failed:", err);
+    }
+    setUploading(false);
+  }, []);
+
+  return { photos, loading, uploading, uploadPhoto, refresh: fetchPhotos };
 }
 
 // ── Init checklist ──

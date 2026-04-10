@@ -14,9 +14,10 @@ interface Props {
   challenges: Challenge[];
   projects: TeamProject[];
   team: Team;
+  onOpenGallery: () => void;
 }
 
-export function ProjectsScreen({ challenges, projects, team }: Props) {
+export function ProjectsScreen({ challenges, projects, team, onOpenGallery }: Props) {
   const { notes } = useNotes();
   const allNotes = useAllNotes();
   const [openIdx, setOpenIdx] = useState<number | null>(null);
@@ -24,8 +25,16 @@ export function ProjectsScreen({ challenges, projects, team }: Props) {
 
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-3">
-      <h1 className="text-lg font-bold text-[#1A1035] mb-0.5">Projets</h1>
-      <p className="text-[11px] text-[#7C6FA0] mb-4">{team.name} · {team.accompanist} · {projects.length} projets</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-bold text-[#1A1035] mb-0.5">Projets</h1>
+          <p className="text-[11px] text-[#7C6FA0]">{team.name} · {team.accompanist} · {projects.length} projets</p>
+        </div>
+        <button onClick={onOpenGallery}
+          className="h-9 px-3.5 rounded-xl bg-[#F3F0FA] text-[#7A4AED] text-xs font-semibold active:scale-95 transition-transform flex items-center gap-1.5">
+          📷 Galerie
+        </button>
+      </div>
 
       {projects.map((p) => {
         const pNotes = notes.filter((n) => n.project_id === p.db_id);
@@ -134,15 +143,6 @@ export function ProjectsScreen({ challenges, projects, team }: Props) {
         </div>
       )}
 
-      {/* Rules */}
-      <div className="rounded-2xl border border-[#F46277]/20 bg-[#FFE3E8]/50 p-4 mt-2">
-        <p className="text-[10px] font-bold text-[#F46277] uppercase tracking-widest mb-2">Rappels</p>
-        <ul className="space-y-1">
-          {["Aucun retard toléré", "Présenter toutes les épreuves", "Tenue professionnelle", "Toujours présenter le projet en premier"].map((r, i) => (
-            <li key={i} className="text-xs text-[#1A1035]/60 pl-3 relative"><span className="absolute left-0 text-[#F46277]/50">–</span>{r}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }

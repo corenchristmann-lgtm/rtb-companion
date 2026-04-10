@@ -33,7 +33,6 @@ function mapsLink(address: string) {
 export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }: Props) {
   const ch = challenges[timer.currentChallengeIndex];
   const [panel, setPanel] = useState<"none" | "tips" | "checklist">("none");
-  const [photos, setPhotos] = useState<Record<number, string[]>>({});
   if (!ch) return null;
 
   const isActive = timer.status === "active";
@@ -54,16 +53,6 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
       else timer.goPrev();
     }
   }, [timer]);
-
-  // (11) Photo capture
-  const fileRef = useRef<HTMLInputElement>(null);
-  const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPhotos(prev => ({ ...prev, [ch.id]: [...(prev[ch.id] || []), url] }));
-    e.target.value = "";
-  };
 
   // Pre-event screen
   if (!timer.isEventDay && !timer.isManualOverride) {
@@ -190,46 +179,29 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onLogout }
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 gap-2.5">
         <button onClick={() => togglePanel("tips")}
-          className={`rounded-2xl py-3 text-center transition-all active:scale-95 ${
+          className={`rounded-2xl py-3.5 text-center transition-all active:scale-95 ${
             panel === "tips" ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/25" : "bg-white border border-[#E8E2F4] shadow-sm"
           }`}>
-          <span className="text-base block mb-0.5">💡</span>
-          <span className="text-[9px] font-semibold">Tips</span>
+          <span className="text-lg block mb-0.5">💡</span>
+          <span className="text-[10px] font-semibold">Tips</span>
         </button>
         <button onClick={() => togglePanel("checklist")}
-          className={`rounded-2xl py-3 text-center transition-all active:scale-95 ${
+          className={`rounded-2xl py-3.5 text-center transition-all active:scale-95 ${
             panel === "checklist" ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/25" : "bg-white border border-[#E8E2F4] shadow-sm"
           }`}>
-          <span className="text-base block mb-0.5">✅</span>
-          <span className="text-[9px] font-semibold">Checklist</span>
+          <span className="text-lg block mb-0.5">✅</span>
+          <span className="text-[10px] font-semibold">Checklist</span>
         </button>
-        {/* (11) Photo */}
-        <button onClick={() => fileRef.current?.click()}
-          className="rounded-2xl py-3 text-center bg-white border border-[#E8E2F4] shadow-sm active:scale-95 transition-transform">
-          <span className="text-base block mb-0.5">📷</span>
-          <span className="text-[9px] font-semibold">Photo</span>
-        </button>
-        <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
         {ch.contact_phone ? (
           <a href={`tel:${ch.contact_phone.replace(/\s/g, "")}`}
-            className="rounded-2xl py-3 text-center bg-white border border-[#E8E2F4] shadow-sm active:scale-95 transition-transform">
-            <span className="text-base block mb-0.5">📞</span>
-            <span className="text-[9px] font-semibold">Appeler</span>
+            className="rounded-2xl py-3.5 text-center bg-white border border-[#E8E2F4] shadow-sm active:scale-95 transition-transform">
+            <span className="text-lg block mb-0.5">📞</span>
+            <span className="text-[10px] font-semibold">Appeler</span>
           </a>
         ) : <div />}
       </div>
-
-      {/* (11) Photo gallery */}
-      {photos[ch.id] && photos[ch.id].length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {photos[ch.id].map((url, i) => (
-            <img key={i} src={url} alt={`Photo ${i + 1}`}
-              className="w-20 h-20 rounded-xl object-cover shrink-0 border border-[#E8E2F4]" />
-          ))}
-        </div>
-      )}
 
       {/* Panels */}
       {panel === "tips" && (
