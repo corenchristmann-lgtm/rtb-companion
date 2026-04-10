@@ -93,10 +93,6 @@ export function MapScreen({ currentTeamId }: Props) {
   const [positions, setPositions] = useState<TeamPosition[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
 
-  // Simulation mode: accelerate time through the event day
-  const [simulating, setSimulating] = useState(false);
-  const [simSeconds, setSimSeconds] = useState(8 * 3600 + 30 * 60); // Start at 08:30
-  const simTimeLabel = `${String(Math.floor(simSeconds / 3600)).padStart(2, "0")}:${String(Math.floor((simSeconds % 3600) / 60)).padStart(2, "0")}`;
 
   // Load leaflet CSS + module
   useEffect(() => {
@@ -128,18 +124,13 @@ export function MapScreen({ currentTeamId }: Props) {
     });
   }, []);
 
-  // Update positions every 30s (or every 100ms in simulation)
-  const updatePositions = useCallback((overrideSec?: number) => {
-    if (overrideSec !== undefined) {
-      setPositions(TEAMS.map((t) => getTeamPosition(t, overrideSec, routes)));
-      return;
-    }
-
+  // Update positions every 30s
+  const updatePositions = useCallback(() => {
     const d = new Date();
     const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     const isEventDay = today === EVENT_DATE;
 
-    if (!isEventDay && !simulating) {
+    if (!isEventDay) {
       const pos = TEAMS.map((t) => {
         const firstLocId = ATELIER_TO_LOCATION[t.schedule[0].atelier_id];
         const loc = LOCATIONS[firstLocId];
@@ -151,38 +142,13 @@ export function MapScreen({ currentTeamId }: Props) {
 
     const nowSec = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
     setPositions(TEAMS.map((t) => getTeamPosition(t, nowSec, routes)));
-  }, [routes, simulating]);
+  }, [routes]);
 
-  // Normal refresh
   useEffect(() => {
-    if (simulating) return;
     updatePositions();
     const interval = setInterval(updatePositions, 30000);
     return () => clearInterval(interval);
-  }, [updatePositions, simulating]);
-
-  // Simulation tick: advance 1 min every 100ms (= 1 hour in ~6 seconds)
-  useEffect(() => {
-    if (!simulating) return;
-    const interval = setInterval(() => {
-      setSimSeconds((prev) => {
-        const next = prev + 60; // +1 minute per tick
-        if (next > 18 * 3600 + 30 * 60) { // Stop at 18:30
-          setSimulating(false);
-          return 8 * 3600 + 30 * 60;
-        }
-        return next;
-      });
-    }, 100);
-    return () => clearInterval(interval);
-  }, [simulating]);
-
-  // Update positions when sim time changes
-  useEffect(() => {
-    if (simulating) {
-      updatePositions(simSeconds);
-    }
-  }, [simSeconds, simulating, updatePositions]);
+  }, [updatePositions]);
 
   if (!leafletReady || !L) {
     return (
@@ -240,23 +206,6 @@ export function MapScreen({ currentTeamId }: Props) {
               </button>
             );
           })}
-        </div>
-      </div>
-
-      {/* Simulation controls */}
-      <div className="px-4 pb-1">
-        <div className="flex items-center gap-2">
-          <button onClick={() => { setSimulating(!simulating); if (!simulating) setSimSeconds(8 * 3600 + 30 * 60); }}
-            className={`h-8 px-3 rounded-lg text-[11px] font-semibold transition-all active:scale-95 ${
-              simulating ? "bg-[#F46277] text-white" : "bg-[#F3F0FA] text-[#7A4AED]"
-            }`}>
-            {simulating ? "⏹ Stop" : "▶ Simulation"}
-          </button>
-          {simulating && (
-            <div className="flex-1 rounded-lg bg-[#F3F0FA] px-3 h-8 flex items-center justify-center">
-              <p className="text-sm font-bold text-[#7A4AED] tabular-nums">{simTimeLabel}</p>
-            </div>
-          )}
         </div>
       </div>
 
