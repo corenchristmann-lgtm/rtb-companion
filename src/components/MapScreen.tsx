@@ -267,8 +267,8 @@ export function MapScreen({ currentTeamId }: Props) {
         <MapContainer center={LIEGE_CENTER} zoom={DEFAULT_ZOOM} className="w-full h-full z-0"
           scrollWheelZoom={true} zoomControl={false}>
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
 
           {/* Workshop markers */}
