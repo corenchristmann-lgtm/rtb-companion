@@ -12,14 +12,15 @@ const items: { id: Tab; label: string }[] = [
 export function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-50 border-t border-[#E8E2F4] bg-white/95 backdrop-blur-xl">
-      <div className="grid grid-cols-4 max-w-lg mx-auto">
+      <div className="grid grid-cols-4 max-w-lg mx-auto px-2 py-1.5 gap-1.5">
         {items.map((item) => (
           <button key={item.id} onClick={() => onChange(item.id)}
-            className={`flex flex-col items-center justify-center gap-1 py-3 min-h-[52px] transition-colors ${
-              active === item.id ? "text-[#7A4AED]" : "text-[#7C6FA0]"
+            className={`flex items-center justify-center rounded-xl min-h-[48px] text-sm font-semibold transition-all ${
+              active === item.id
+                ? "bg-[#7A4AED] text-white shadow-sm shadow-[#7A4AED]/20"
+                : "text-[#7C6FA0] active:bg-[#F3F0FA]"
             }`}>
-            <span className="text-[11px] font-semibold">{item.label}</span>
-            {active === item.id && <div className="w-1 h-1 rounded-full bg-[#7A4AED]" />}
+            {item.label}
           </button>
         ))}
       </div>
