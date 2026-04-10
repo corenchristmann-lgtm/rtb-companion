@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { usePhotos } from "@/hooks/useSupabase";
+import type { Photo } from "@/types/database";
 
 interface Props {
   teamName: string;
@@ -11,6 +12,7 @@ interface Props {
 export function GalleryScreen({ teamName, onBack }: Props) {
   const { photos, loading, uploading, uploadPhoto } = usePhotos();
   const fileRef = useRef<HTMLInputElement>(null);
+  const [viewPhoto, setViewPhoto] = useState<Photo | null>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,15 +65,31 @@ export function GalleryScreen({ teamName, onBack }: Props) {
       ) : (
         <div className="grid grid-cols-3 gap-1.5">
           {photos.map((photo) => (
-            <div key={photo.id} className="relative aspect-square rounded-xl overflow-hidden bg-[#F3F0FA]">
+            <button key={photo.id} onClick={() => setViewPhoto(photo)}
+              className="relative aspect-square rounded-xl overflow-hidden bg-[#F3F0FA]">
               <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
               {photo.team_name && (
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1.5">
                   <p className="text-[9px] text-white font-semibold truncate">{photo.team_name}</p>
                 </div>
               )}
-            </div>
+            </button>
           ))}
+        </div>
+      )}
+
+      {/* Fullscreen lightbox */}
+      {viewPhoto && (
+        <div className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center"
+          onClick={() => setViewPhoto(null)}>
+          <button onClick={() => setViewPhoto(null)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 text-white text-xl font-bold flex items-center justify-center">
+            ✕
+          </button>
+          <img src={viewPhoto.url} alt="" className="max-w-full max-h-[80vh] object-contain rounded-lg" />
+          {viewPhoto.team_name && (
+            <p className="text-sm text-white/80 mt-3">{viewPhoto.team_name}</p>
+          )}
         </div>
       )}
     </div>
