@@ -67,35 +67,76 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
       </div>
 
       {/* Countdown / Status */}
-      <div className="text-center py-3">
-        {!isEventDay ? (
-          <>
-            <p className="text-5xl font-extrabold text-[#7A4AED] timer-display">
-              {timer.daysUntilEvent > 0 ? `J-${timer.daysUntilEvent}` : "RTB terminé"}
-            </p>
-            <p className="text-sm text-[#7C6FA0] mt-2">{timer.label}</p>
-            <p className="text-xs text-[#7C6FA0] mt-0.5">Lundi 13 avril 2026 · Liege</p>
-          </>
-        ) : (
-          <>
-            <p className={`text-5xl font-extrabold timer-display ${
-              timer.status === "active" && timer.remainingSeconds <= 300 ? "text-[#F46277]" :
-              timer.status === "active" ? "text-[#1A1035]" : "text-[#7A4AED]"
+      {!isEventDay ? (
+        <div className="text-center py-3">
+          <p className="text-5xl font-extrabold text-[#7A4AED] timer-display">
+            {timer.daysUntilEvent > 0 ? `J-${timer.daysUntilEvent}` : "RTB termine"}
+          </p>
+          <p className="text-sm text-[#7C6FA0] mt-2">{timer.label}</p>
+          <p className="text-xs text-[#7C6FA0] mt-0.5">Lundi 13 avril 2026 · Liege</p>
+        </div>
+      ) : (() => {
+        const ch = challenges[timer.currentChallengeIndex];
+        const nextCh = challenges[timer.currentChallengeIndex + 1];
+        const allDone = timer.status === "completed" && timer.currentChallengeIndex === challenges.length - 1;
+        const urgent = timer.status === "active" && timer.remainingSeconds <= 300;
+
+        return (
+          <div className={`rounded-2xl p-4 text-center ${
+            urgent ? "bg-[#F46277]/10 border border-[#F46277]/30" :
+            timer.status === "active" ? "bg-[#7A4AED]/5 border border-[#7A4AED]/20" :
+            timer.status === "in_transit" ? "bg-amber-50 border border-amber-200" :
+            "bg-[#F3F0FA]"
+          }`}>
+            {/* Current challenge name */}
+            {ch && !allDone && (
+              <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${
+                urgent ? "text-[#F46277]" :
+                timer.status === "active" ? "text-[#7A4AED]" :
+                timer.status === "in_transit" ? "text-amber-600" : "text-[#7C6FA0]"
+              }`}>
+                {timer.status === "active" ? ch.company : timer.status === "in_transit" ? `Prochain : ${ch.company}` : ch.company}
+              </p>
+            )}
+
+            {/* Timer */}
+            <p className={`text-5xl font-extrabold timer-display leading-none ${
+              allDone ? "text-emerald-500" :
+              urgent ? "text-[#F46277]" :
+              timer.status === "active" ? "text-[#1A1035]" :
+              timer.status === "in_transit" ? "text-amber-600" : "text-[#7A4AED]"
             }`}>
-              {timer.status === "completed" && timer.currentChallengeIndex === challenges.length - 1
-                ? "Fini !" : formatTime(timer.remainingSeconds)}
+              {allDone ? "Fini !" : formatTime(timer.remainingSeconds)}
             </p>
-            <p className="text-sm text-[#7C6FA0] mt-2">{timer.label}</p>
+
+            {/* Label */}
+            <p className="text-sm text-[#7C6FA0] mt-1.5">{timer.label}</p>
+
+            {/* Progress bar (active only) */}
             {timer.status === "active" && (
-              <div className="mt-3 mx-auto max-w-[240px] h-1.5 bg-[#F3F0FA] rounded-full overflow-hidden">
+              <div className="mt-3 mx-auto max-w-[240px] h-1.5 bg-white/60 rounded-full overflow-hidden">
                 <div className={`h-full rounded-full transition-all duration-1000 ease-linear ${
-                  timer.remainingSeconds <= 300 ? "bg-[#F46277]" : "bg-[#7A4AED]"
+                  urgent ? "bg-[#F46277]" : "bg-[#7A4AED]"
                 }`} style={{ width: `${timer.progressPercent}%` }} />
               </div>
             )}
-          </>
-        )}
-      </div>
+
+            {/* What's next after this challenge */}
+            {timer.status === "active" && ch.transport_to_next && nextCh && (
+              <p className="text-[11px] text-[#7C6FA0] mt-2.5">
+                Ensuite : <span className="font-semibold text-[#1A1035]">{ch.transport_to_next}</span> vers {nextCh.company}
+              </p>
+            )}
+
+            {/* During transit, show destination info */}
+            {timer.status === "in_transit" && ch && (
+              <p className="text-[11px] text-[#7C6FA0] mt-2">
+                {ch.start_time} – {ch.end_time} · {ch.format}
+              </p>
+            )}
+          </div>
+        );
+      })()}
 
       {/* 8 Challenges */}
       <div className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm">
