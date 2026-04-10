@@ -50,7 +50,7 @@ export function TeamSelector({ onSelect }: { onSelect: (id: number) => void }) {
         </div>
 
         <p className="text-[10px] text-[#7C6FA0]/50 text-center">
-          Companion app pour accompagnateurs RTB
+          App pour accompagnateurs RTB
         </p>
       </div>
     </div>
