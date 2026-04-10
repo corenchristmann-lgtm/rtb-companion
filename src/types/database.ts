@@ -56,6 +56,14 @@ export interface Photo {
   created_at: string;
 }
 
+export interface PhotoComment {
+  id: number;
+  photo_id: number;
+  content: string;
+  team_name: string;
+  created_at: string;
+}
+
 export type ChallengeStatusType = "upcoming" | "in_transit" | "active" | "completed";
 
 export interface ChallengeStatus {

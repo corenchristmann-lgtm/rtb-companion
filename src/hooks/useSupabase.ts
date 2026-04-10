@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getSupabase } from "@/lib/supabase";
-import type { ChecklistItem, Note, Photo } from "@/types/database";
+import type { ChecklistItem, Note, Photo, PhotoComment } from "@/types/database";
 import { DEFAULT_CHECKLIST } from "@/lib/teams";
 
 // ── Offline helpers ──
@@ -161,6 +161,33 @@ export function usePhotos() {
   }, []);
 
   return { photos, loading, uploading, uploadPhoto, refresh: fetchPhotos };
+}
+
+// ── Photo comments ──
+export function usePhotoComments(photoId: number) {
+  const [comments, setComments] = useState<PhotoComment[]>([]);
+  const lsKey = `rtb-photo-comments-${photoId}`;
+
+  const fetchComments = useCallback(async () => {
+    try {
+      const { data } = await getSupabase().from("photo_comments").select("*").eq("photo_id", photoId).order("created_at", { ascending: true });
+      if (data) { setComments(data as PhotoComment[]); lsSet(lsKey, data); return; }
+    } catch {}
+    setComments(lsGet(lsKey, []));
+  }, [photoId, lsKey]);
+
+  useEffect(() => { fetchComments(); }, [fetchComments]);
+
+  const addComment = useCallback(async (content: string, teamName: string) => {
+    const optimistic: PhotoComment = { id: Date.now(), photo_id: photoId, content, team_name: teamName, created_at: new Date().toISOString() };
+    setComments(prev => [...prev, optimistic]);
+    try {
+      const { data } = await getSupabase().from("photo_comments").insert({ photo_id: photoId, content, team_name: teamName }).select().single();
+      if (data) setComments(prev => prev.map(c => c.id === optimistic.id ? (data as PhotoComment) : c));
+    } catch {}
+  }, [photoId]);
+
+  return { comments, addComment };
 }
 
 // ── Init checklist ──
