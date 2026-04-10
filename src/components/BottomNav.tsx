@@ -4,13 +4,14 @@ import type { Tab } from "@/app/page";
 
 const items: { id: Tab; label: string }[] = [
   { id: "board", label: "Board" },
+  { id: "map", label: "Maps" },
   { id: "gallery", label: "Galerie" },
 ];
 
 export function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-50 border-t border-[#E8E2F4] bg-white/95 backdrop-blur-xl">
-      <div className="grid grid-cols-2 max-w-lg mx-auto px-2 py-1.5 gap-1.5">
+      <div className="grid grid-cols-3 max-w-lg mx-auto px-2 py-1.5 gap-1.5">
         {items.map((item) => (
           <button key={item.id} onClick={() => onChange(item.id)}
             className={`relative flex items-center justify-center rounded-xl min-h-[48px] text-sm font-semibold transition-all ${
