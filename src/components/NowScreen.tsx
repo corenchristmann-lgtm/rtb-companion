@@ -88,6 +88,10 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onOpenGall
             ))}
           </div>
         </div>
+        <button onClick={onOpenGallery}
+          className="w-full h-12 rounded-2xl bg-[#7A4AED] text-white text-sm font-semibold active:scale-95 transition-transform shadow-md shadow-[#7A4AED]/25">
+          Galerie Photos
+        </button>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
           {CONTACTS.map((c) => (
             <a key={c.name} href={c.phone.startsWith("+") ? `tel:${c.phone.replace(/\s/g, "")}` : undefined}
@@ -203,12 +207,6 @@ export function NowScreen({ timer, challenges, team, onOpenChallenge, onOpenGall
           </a>
         ) : <div />}
       </div>
-
-      {/* Gallery button */}
-      <button onClick={onOpenGallery}
-        className="w-full h-12 rounded-2xl bg-[#7A4AED] text-white text-sm font-semibold active:scale-95 transition-transform shadow-md shadow-[#7A4AED]/25">
-        Galerie Photos
-      </button>
 
       {/* Panels */}
       {panel === "tips" && (
