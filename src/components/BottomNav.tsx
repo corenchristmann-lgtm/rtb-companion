@@ -3,7 +3,7 @@
 import type { Tab } from "@/app/page";
 
 const items: { id: Tab; label: string }[] = [
-  { id: "now", label: "Maintenant" },
+  { id: "now", label: "Board" },
   { id: "planning", label: "Planning" },
   { id: "score", label: "Noter" },
   { id: "projects", label: "Projets" },
