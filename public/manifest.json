@@ -4,7 +4,7 @@
   "description": "Road-to-Business companion",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0F0E17",
+  "background_color": "#FAFAFA",
   "theme_color": "#7A4AED",
   "orientation": "portrait",
   "icons": [

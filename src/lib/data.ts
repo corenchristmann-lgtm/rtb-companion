@@ -2,7 +2,7 @@ import type { Challenge, Project } from "@/types/database";
 
 export const CHALLENGES: Challenge[] = [
   {
-    id: 1, position: 1, company: "BNP Paribas Fortis", emoji: "🏦",
+    id: 1, position: 1, company: "BNP Paribas Fortis", emoji: "/logos/bnp.png",
     start_time: "08:45", end_time: "09:15",
     location: "Salle Georges Simenon, 4e étage",
     address: "Place Xavier Neujean 2, 4000 Liège (entrée par le patio)",
@@ -24,7 +24,7 @@ export const CHALLENGES: Challenge[] = [
     prize: "1 000 €", transport_to_next: "11 min à pied vers UCM"
   },
   {
-    id: 2, position: 2, company: "UCM", emoji: "🧑‍💼",
+    id: 2, position: 2, company: "UCM", emoji: "/logos/ucm.png",
     start_time: "09:45", end_time: "10:15",
     location: "Bureaux UCM – 9e étage",
     address: "Boulevard d'Avroy 42, 4000 Liège",
@@ -45,7 +45,7 @@ export const CHALLENGES: Challenge[] = [
     prize: "1 000 €", transport_to_next: "2 min à pied (même avenue)"
   },
   {
-    id: 3, position: 3, company: "Wallonie Entreprendre", emoji: "🌍",
+    id: 3, position: 3, company: "Wallonie Entreprendre", emoji: "/logos/we.png",
     start_time: "10:30", end_time: "11:00",
     location: "Accueil – panneau WE et sofas",
     address: "Avenue Maurice Destenay 13, 4000 Liège",
@@ -65,7 +65,7 @@ export const CHALLENGES: Challenge[] = [
     prize: "1 000 €", transport_to_next: "Tram T1 → Pont d'Avroy → Petit Paradis (3 arrêts)"
   },
   {
-    id: 4, position: 4, company: "Loterie Nationale", emoji: "🎲",
+    id: 4, position: 4, company: "Loterie Nationale", emoji: "/logos/loterie.png",
     start_time: "11:30", end_time: "12:00",
     location: "Hub Liège",
     address: "Avenue Blonden 84, 4000 Liège",
@@ -85,7 +85,7 @@ export const CHALLENGES: Challenge[] = [
     prize: "1 000 €", transport_to_next: "LUNCH puis Bus B2 12h19 : Guillemins → Sart-Tilman → 16 min à pied"
   },
   {
-    id: 5, position: 5, company: "EVS", emoji: "📡",
+    id: 5, position: 5, company: "EVS", emoji: "/logos/evs.jpg",
     start_time: "13:30", end_time: "14:00",
     location: "Bureaux EVS – Albert's Room",
     address: "Rue du Bois Saint-Jean 13, 4102 Seraing",
@@ -106,7 +106,7 @@ export const CHALLENGES: Challenge[] = [
     prize: "1 000 €", transport_to_next: "Voiture VentureLab (VW Caravelle, chauffeur Robin)"
   },
   {
-    id: 6, position: 6, company: "Defenso", emoji: "⚖️",
+    id: 6, position: 6, company: "Defenso", emoji: "/logos/defenso.png",
     start_time: "14:30", end_time: "15:00",
     location: "Bureaux Defenso",
     address: "Place George Ista 28, 4030 Liège",
@@ -126,7 +126,7 @@ export const CHALLENGES: Challenge[] = [
     prize: "1 000 €", transport_to_next: "Bus L17 15h19 → Pont de Longdoz → 6 min à pied"
   },
   {
-    id: 7, position: 7, company: "AKT CCI", emoji: "🤝",
+    id: 7, position: 7, company: "AKT CCI", emoji: "/logos/akt.png",
     start_time: "16:00", end_time: "16:30",
     location: "VentureLab – Salle des Métamorphoses (RDC)",
     address: "Rue des Carmes 24, 4000 Liège",
@@ -146,7 +146,7 @@ export const CHALLENGES: Challenge[] = [
     prize: "1 000 €", transport_to_next: "Porte à côté (même bâtiment)"
   },
   {
-    id: 8, position: 8, company: "VEDIA", emoji: "🎬",
+    id: 8, position: 8, company: "VEDIA", emoji: "/logos/vedia.png",
     start_time: "16:30", end_time: "17:00",
     location: "VentureLab – Salle des Créations (1er étage)",
     address: "Rue des Carmes 24, 4000 Liège",
@@ -168,22 +168,10 @@ export const CHALLENGES: Challenge[] = [
 ];
 
 export const PROJECTS: Project[] = [
-  {
-    id: 1, name: "LaJusteDose", members: "Mélodie Kubushishi",
-    description: "Solutions low-tech pour sécuriser la distribution de médicaments en maisons de repos."
-  },
-  {
-    id: 2, name: "VILO", members: "Guillaume Vilet",
-    description: "Plateforme de centralisation du contenu généré par les utilisateurs lors d'événements."
-  },
-  {
-    id: 3, name: "Bissap Origins", members: "Elvis, Boubacar, Emmanuel, Matteo",
-    description: "Boissons naturelles à base d'hibiscus africain. Marque moderne, saine et durable."
-  },
-  {
-    id: 4, name: "Camille Changeur", members: "Camille Changeur",
-    description: "Photographe spécialisée dans les animaux de compagnie."
-  }
+  { id: 1, name: "LaJusteDose", members: "Mélodie Kubushishi", description: "Solutions low-tech pour sécuriser la distribution de médicaments en maisons de repos." },
+  { id: 2, name: "VILO", members: "Guillaume Vilet", description: "Plateforme de centralisation du contenu généré par les utilisateurs lors d'événements." },
+  { id: 3, name: "Bissap Origins", members: "Elvis, Boubacar, Emmanuel, Matteo", description: "Boissons naturelles à base d'hibiscus africain. Marque moderne, saine et durable." },
+  { id: 4, name: "Camille Changeur", members: "Camille Changeur", description: "Photographe spécialisée dans les animaux de compagnie." }
 ];
 
 export const CONTACTS = [
@@ -192,80 +180,13 @@ export const CONTACTS = [
   { name: "Corentin", role: "Accompagnateur Équipe 1", phone: "+33 7 82 54 33 94" },
 ];
 
-export const RULES = [
-  "Aucun retard toléré",
-  "Présenter toutes les épreuves, même incomplètes",
-  "Tenue et attitude professionnelles",
-  "Toujours présenter le projet en premier",
-  "Les entreprises sont des partenaires potentiels",
-];
-
 export const DEFAULT_CHECKLIST: Record<number, string[]> = {
-  1: [
-    "Pas de support visuel, pitch oral uniquement",
-    "Pitch structuré : problème → valeur → pour qui",
-    "Chiffres concrets prêts pour le Q/A",
-    "CTA clair préparé",
-    "Timing : 3 min max",
-    "Présenter son projet d'abord",
-    "Focus plus-value (attente jury)",
-    "Ne pas parler après le passage"
-  ],
-  2: [
-    "Core business + compétences identifiés",
-    "Compétences manquantes + solutions listées",
-    "Support papier/flipchart prêt",
-    "Si ASBL → « don » pas « commande »",
-    "Présenter le projet en premier",
-    "Risques/opportunités de s'entourer"
-  ],
-  3: [
-    "Trio projet-ambition-challenge structuré",
-    "Slides : 5 images max, pas de texte",
-    "Données d'impact chiffrées",
-    "Impact large : qualité de vie, expertise…",
-    "Pas de texte sur les slides",
-    "Jury exigeant – bien se préparer"
-  ],
-  4: [
-    "Angle « hasard » trouvé (passé ou futur)",
-    "Storytelling préparé",
-    "Accessoires/props si pertinents",
-    "Comment provoquer la chance",
-    "Enregistrement sur place",
-    "1 min projet + 2 min hasard + 2 min feedback"
-  ],
-  5: [
-    "Besoin client clairement identifié",
-    "Stratégie marketing digital concrète",
-    "Campagne prête si possible",
-    "IA encouragée",
-    "5WHY pour creuser le besoin",
-    "Stratégie adaptée au challenge"
-  ],
-  6: [
-    "3 risques (commercial/production, PAS technique)",
-    "1 risque choisi pour l'oral",
-    "Solutions pour chaque risque",
-    "Fiche lisible (à laisser sur place)",
-    "Pas de risque « croissance »",
-    "Montrer qu'on anticipe"
-  ],
-  7: [
-    "Fiche participants AKT CCI consultée",
-    "Faire du LIEN, pas se présenter",
-    "Posture d'écoute et connexion",
-    "Se renseigner sur les participants",
-    "Apporter à son réseau",
-    "Attitude et posture comptent"
-  ],
-  8: [
-    "1 personne par groupe face caméra",
-    "Entraînement caméra fait",
-    "Une seule prise, pas de recommencement",
-    "Yeux dans la caméra toujours",
-    "Vidéo conseils visionnée",
-    "Accessoires préparés",
-    "60s lecture + 4 min prépa + 1m30 caméra"
-  ]
+  1: ["Pas de support visuel, pitch oral uniquement", "Pitch structuré : problème → valeur → pour qui", "Chiffres concrets prêts pour le Q/A", "CTA clair préparé", "Timing : 3 min max", "Présenter son projet d'abord", "Focus plus-value (attente jury)", "Ne pas parler après le passage"],
+  2: ["Core business + compétences identifiés", "Compétences manquantes + solutions listées", "Support papier/flipchart prêt", "Si ASBL → « don » pas « commande »", "Présenter le projet en premier", "Risques/opportunités de s'entourer"],
+  3: ["Trio projet-ambition-challenge structuré", "Slides : 5 images max, pas de texte", "Données d'impact chiffrées", "Impact large : qualité de vie, expertise…", "Pas de texte sur les slides", "Jury exigeant – bien se préparer"],
+  4: ["Angle « hasard » trouvé (passé ou futur)", "Storytelling préparé", "Accessoires/props si pertinents", "Comment provoquer la chance", "Enregistrement sur place", "1 min projet + 2 min hasard + 2 min feedback"],
+  5: ["Besoin client clairement identifié", "Stratégie marketing digital concrète", "Campagne prête si possible", "IA encouragée", "5WHY pour creuser le besoin", "Stratégie adaptée au challenge"],
+  6: ["3 risques (commercial/production, PAS technique)", "1 risque choisi pour l'oral", "Solutions pour chaque risque", "Fiche lisible (à laisser sur place)", "Pas de risque « croissance »", "Montrer qu'on anticipe"],
+  7: ["Fiche participants AKT CCI consultée", "Faire du LIEN, pas se présenter", "Posture d'écoute et connexion", "Se renseigner sur les participants", "Apporter à son réseau", "Attitude et posture comptent"],
+  8: ["1 personne par groupe face caméra", "Entraînement caméra fait", "Une seule prise, pas de recommencement", "Yeux dans la caméra toujours", "Vidéo conseils visionnée", "Accessoires préparés", "60s lecture + 4 min prépa + 1m30 caméra"]
 };

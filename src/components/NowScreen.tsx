@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CHALLENGES, CONTACTS } from "@/lib/data";
 import { formatTime } from "@/hooks/useTimer";
 import { ChecklistTab } from "./ChecklistTab";
+import { CompanyLogo } from "./CompanyLogo";
 
 interface Props {
   timer: ReturnType<typeof import("@/hooks/useTimer").useTimer>;
@@ -28,13 +29,13 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
         <div className="flex items-center gap-2.5">
           <div className={`w-2.5 h-2.5 rounded-full ${
             isActive ? (urgent ? "bg-[#F46277] animate-breathe" : "bg-[#7A4AED] animate-breathe") :
-            isTransit ? "bg-[#FBBF24]" :
-            isDone ? "bg-[#34D399]" : "bg-muted-foreground/30"
+            isTransit ? "bg-amber-500" :
+            isDone ? "bg-emerald-500" : "bg-gray-300"
           }`} />
           <span className={`text-[11px] font-bold uppercase tracking-widest ${
             isActive ? (urgent ? "text-[#F46277]" : "text-[#7A4AED]") :
-            isTransit ? "text-[#FBBF24]" :
-            isDone ? "text-[#34D399]" : "text-muted-foreground"
+            isTransit ? "text-amber-600" :
+            isDone ? "text-emerald-600" : "text-gray-400"
           }`}>
             {isActive ? (urgent ? "Fin imminente" : "En cours") :
              isTransit ? "En transit" :
@@ -44,9 +45,9 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
         <div className="flex items-center gap-1.5">
           {CHALLENGES.map((_, i) => (
             <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${
-              i < timer.completedCount ? "bg-[#34D399]" :
+              i < timer.completedCount ? "bg-emerald-500" :
               i === timer.currentChallengeIndex ? "bg-[#7A4AED]" :
-              "bg-muted-foreground/15"
+              "bg-gray-200"
             }`} />
           ))}
         </div>
@@ -55,13 +56,15 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
       {/* Giant Timer */}
       <div className="text-center py-4">
         <p className={`text-7xl font-extrabold timer-display leading-none ${
-          urgent ? "text-[#F46277]" : isActive ? "text-foreground" : "text-muted-foreground/60"
+          urgent ? "text-[#F46277]" :
+          isActive ? "text-[#1A1035]" :
+          "text-gray-300"
         }`}>
           {isDone ? "✓" : formatTime(timer.remainingSeconds)}
         </p>
         <p className="text-sm text-muted-foreground mt-3">{timer.label}</p>
         {isActive && (
-          <div className="mt-4 mx-auto max-w-[240px] h-1.5 bg-[#232136] rounded-full overflow-hidden">
+          <div className="mt-4 mx-auto max-w-[240px] h-1.5 bg-[#F3F0FA] rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-1000 ease-linear ${urgent ? "bg-[#F46277]" : "bg-[#7A4AED]"}`}
               style={{ width: `${timer.progressPercent}%` }}
@@ -73,57 +76,47 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
       {/* Challenge card */}
       <div
         onClick={() => onOpenChallenge(ch.id)}
-        className="rounded-2xl border border-[#2E2B45] bg-[#1A1927] p-4 vl-glow cursor-pointer active:scale-[0.98] transition-transform"
+        className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm cursor-pointer active:scale-[0.98] transition-transform"
       >
         <div className="flex items-start gap-3">
-          <div className="w-11 h-11 rounded-xl bg-[#7A4AED]/15 flex items-center justify-center text-xl shrink-0">
-            {ch.emoji}
-          </div>
+          <CompanyLogo src={ch.emoji ?? ""} company={ch.company} size={44} />
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-muted-foreground mb-0.5">Challenge {ch.position}/8</p>
-            <p className="text-base font-bold leading-tight">{ch.company}</p>
+            <p className="text-base font-bold leading-tight text-[#1A1035]">{ch.company}</p>
             <p className="text-xs text-muted-foreground mt-1">{ch.start_time} – {ch.end_time} · {ch.location}</p>
           </div>
         </div>
-        <p className="text-[13px] text-foreground/70 mt-3 leading-relaxed">{ch.challenge_description}</p>
+        <p className="text-[13px] text-[#1A1035]/70 mt-3 leading-relaxed">{ch.challenge_description}</p>
         <div className="mt-2 flex items-center gap-2">
-          <span className="text-[10px] font-semibold text-[#7A4AED] bg-[#7A4AED]/10 px-2 py-0.5 rounded-md">{ch.format}</span>
+          <span className="text-[10px] font-semibold text-[#7A4AED] bg-[#F3F0FA] px-2 py-0.5 rounded-md">{ch.format}</span>
           <span className="text-[10px] text-muted-foreground">· {ch.prize}</span>
         </div>
       </div>
 
-      {/* Quick action buttons */}
+      {/* Quick actions */}
       <div className="grid grid-cols-3 gap-2.5">
-        <button
-          onClick={() => togglePanel("tips")}
+        <button onClick={() => togglePanel("tips")}
           className={`rounded-2xl py-3.5 text-center transition-all active:scale-95 ${
-            panel === "tips"
-              ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/20"
-              : "bg-[#1A1927] border border-[#2E2B45]"
-          }`}
-        >
+            panel === "tips" ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/25" : "bg-white border border-[#E8E2F4] shadow-sm"
+          }`}>
           <span className="text-lg block mb-0.5">💡</span>
           <span className="text-[10px] font-semibold">Tips</span>
         </button>
-        <button
-          onClick={() => togglePanel("checklist")}
+        <button onClick={() => togglePanel("checklist")}
           className={`rounded-2xl py-3.5 text-center transition-all active:scale-95 ${
-            panel === "checklist"
-              ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/20"
-              : "bg-[#1A1927] border border-[#2E2B45]"
-          }`}
-        >
+            panel === "checklist" ? "bg-[#7A4AED] text-white shadow-lg shadow-[#7A4AED]/25" : "bg-white border border-[#E8E2F4] shadow-sm"
+          }`}>
           <span className="text-lg block mb-0.5">✅</span>
           <span className="text-[10px] font-semibold">Checklist</span>
         </button>
         {ch.contact_phone ? (
           <a href={`tel:${ch.contact_phone.replace(/\s/g, "")}`}
-            className="rounded-2xl py-3.5 text-center bg-[#1A1927] border border-[#2E2B45] active:scale-95 transition-transform">
+            className="rounded-2xl py-3.5 text-center bg-white border border-[#E8E2F4] shadow-sm active:scale-95 transition-transform">
             <span className="text-lg block mb-0.5">📞</span>
             <span className="text-[10px] font-semibold">Appeler</span>
           </a>
         ) : (
-          <div className="rounded-2xl py-3.5 text-center bg-[#1A1927] border border-[#2E2B45] opacity-30">
+          <div className="rounded-2xl py-3.5 text-center bg-white border border-[#E8E2F4] opacity-30">
             <span className="text-lg block mb-0.5">📞</span>
             <span className="text-[10px] font-semibold">Appeler</span>
           </div>
@@ -132,11 +125,11 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
 
       {/* Tips panel */}
       {panel === "tips" && (
-        <div className="rounded-2xl border border-[#2E2B45] bg-[#1A1927] p-4 animate-slide-up space-y-4">
+        <div className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm animate-slide-up space-y-4">
           {ch.briefing_notes && (
-            <div className="rounded-xl bg-[#F46277]/8 border border-[#F46277]/15 p-3">
+            <div className="rounded-xl bg-[#FFE3E8] p-3">
               <p className="text-[10px] font-bold text-[#F46277] uppercase tracking-widest mb-1">Briefing</p>
-              <p className="text-[13px] leading-relaxed">{ch.briefing_notes}</p>
+              <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.briefing_notes}</p>
             </div>
           )}
           <div>
@@ -144,53 +137,47 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
             <ul className="space-y-2">
               {ch.tips.map((t, i) => (
                 <li key={i} className="text-[13px] leading-relaxed pl-4 relative">
-                  <span className="absolute left-0 text-[#7A4AED]/50 font-bold">›</span>{t}
+                  <span className="absolute left-0 text-[#7A4AED] font-bold">›</span>{t}
                 </li>
               ))}
             </ul>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {ch.skills.map((s) => (
-              <span key={s} className="text-[10px] bg-[#7A4AED]/10 text-[#9B73F2] px-2 py-0.5 rounded-md font-medium">{s}</span>
+              <span key={s} className="text-[10px] bg-[#F3F0FA] text-[#7A4AED] px-2 py-0.5 rounded-md font-medium">{s}</span>
             ))}
           </div>
           <div>
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Jury</p>
-            <p className="text-[13px] text-foreground/60">{ch.jury.join(" · ")}</p>
+            <p className="text-[13px] text-[#1A1035]/60">{ch.jury.join(" · ")}</p>
           </div>
         </div>
       )}
 
       {/* Checklist panel */}
-      {panel === "checklist" && (
-        <div className="animate-slide-up">
-          <ChecklistTab challengeId={ch.id} />
-        </div>
-      )}
+      {panel === "checklist" && <div className="animate-slide-up"><ChecklistTab challengeId={ch.id} /></div>}
 
       {/* Navigation */}
       <div className="flex gap-2.5">
         <button onClick={timer.goPrev} disabled={timer.currentChallengeIndex === 0}
-          className="flex-1 h-11 rounded-xl bg-[#1A1927] border border-[#2E2B45] text-xs font-semibold disabled:opacity-20 active:scale-95 transition-transform">
+          className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4] text-xs font-semibold text-[#1A1035] disabled:opacity-20 active:scale-95 transition-transform shadow-sm">
           ← Précédent
         </button>
         {timer.isManualOverride && (
           <button onClick={timer.resetToAuto}
-            className="h-11 px-4 rounded-xl bg-[#7A4AED]/15 text-[#7A4AED] text-xs font-semibold">
-            Auto
-          </button>
+            className="h-11 px-4 rounded-xl bg-[#F3F0FA] text-[#7A4AED] text-xs font-semibold">Auto</button>
         )}
         <button onClick={timer.goNext} disabled={timer.currentChallengeIndex === CHALLENGES.length - 1}
-          className="flex-1 h-11 rounded-xl bg-[#1A1927] border border-[#2E2B45] text-xs font-semibold disabled:opacity-20 active:scale-95 transition-transform">
+          className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4] text-xs font-semibold text-[#1A1035] disabled:opacity-20 active:scale-95 transition-transform shadow-sm">
           Suivant →
         </button>
       </div>
 
       {/* Transport */}
       {ch.transport_to_next && (
-        <div className="rounded-2xl border border-[#2E2B45] bg-[#1A1927] p-4">
+        <div className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Prochain transport</p>
-          <p className="text-[13px] leading-relaxed">{ch.transport_to_next}</p>
+          <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.transport_to_next}</p>
         </div>
       )}
 
@@ -199,12 +186,10 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
         {CONTACTS.map((c) => (
           <a key={c.name}
             href={c.phone.startsWith("+") ? `tel:${c.phone.replace(/\s/g, "")}` : undefined}
-            className="shrink-0 rounded-xl border border-[#2E2B45] bg-[#1A1927] px-3.5 py-2.5 min-w-[130px]">
-            <p className="text-xs font-semibold">{c.name}</p>
+            className="shrink-0 rounded-xl border border-[#E8E2F4] bg-white px-3.5 py-2.5 min-w-[130px] shadow-sm">
+            <p className="text-xs font-semibold text-[#1A1035]">{c.name}</p>
             <p className="text-[10px] text-muted-foreground">{c.role}</p>
-            {c.phone.startsWith("+") && (
-              <p className="text-[10px] text-[#7A4AED] mt-0.5 font-medium">{c.phone}</p>
-            )}
+            {c.phone.startsWith("+") && <p className="text-[10px] text-[#7A4AED] mt-0.5 font-medium">{c.phone}</p>}
           </a>
         ))}
       </div>
