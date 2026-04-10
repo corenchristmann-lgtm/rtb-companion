@@ -193,86 +193,92 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
 
                 {/* Expanded detail card */}
                 {isExpanded && (
-                  <div className="ml-2 mr-12 mt-1 mb-3 rounded-2xl border border-[#E8E2F4] bg-[#FAFAFE] p-4 space-y-3 animate-slide-up">
-                    {/* Time banner */}
-                    <div className="flex items-center justify-between bg-[#7A4AED] text-white rounded-xl px-4 py-2.5">
-                      <div>
-                        <p className="text-lg font-bold tabular-nums">{ch.start_time} – {ch.end_time}</p>
-                        <p className="text-[10px] opacity-80">{ch.format}</p>
-                      </div>
-                      <p className="text-2xl">{ch.position}/8</p>
-                    </div>
+                  <div className="mt-2 mb-3 rounded-2xl border border-[#E8E2F4] bg-white shadow-sm overflow-hidden animate-slide-up">
 
-                    {/* Description */}
-                    <div className="rounded-xl bg-[#F3F0FA] p-3">
-                      <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.challenge_description}</p>
-                    </div>
-
-                    {/* Briefing */}
-                    {ch.briefing_notes && (
-                      <div className="rounded-xl bg-[#FFE3E8] p-3">
-                        <p className="text-[10px] font-bold text-[#F46277] uppercase tracking-widest mb-1">Briefing</p>
-                        <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.briefing_notes}</p>
-                      </div>
-                    )}
-
-                    {/* Tips */}
-                    <div>
-                      <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest mb-1.5">Conseils</p>
-                      <ul className="space-y-1.5">
-                        {ch.tips.map((t, ti) => (
-                          <li key={ti} className="text-[13px] leading-relaxed pl-3.5 relative text-[#1A1035]/80">
-                            <span className="absolute left-0 text-[#7A4AED] font-bold">›</span>{t}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Skills */}
-                    <div className="flex flex-wrap gap-1.5">
-                      {ch.skills.map((s) => (
-                        <span key={s} className="text-[10px] bg-[#F3F0FA] text-[#7A4AED] px-2 py-0.5 rounded-md font-medium">{s}</span>
-                      ))}
-                    </div>
-
-                    {/* Location */}
-                    <div>
-                      <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest">Lieu</p>
-                      <a href={mapsLink(ch.address)} target="_blank" rel="noopener noreferrer"
-                        className="text-sm text-[#7A4AED] font-medium mt-0.5 block">
-                        📍 {ch.address}
-                      </a>
-                    </div>
-
-                    {/* Jury */}
-                    <div>
-                      <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest">Jury</p>
-                      <p className="text-[13px] text-[#1A1035]/60 mt-0.5">{ch.jury.join(" · ")}</p>
-                    </div>
-
-                    {/* Contact */}
-                    {ch.contact_name && ch.contact_phone && (
+                    {/* ── SECTION 1 : L'essentiel ── */}
+                    <div className="bg-[#7A4AED] text-white px-4 py-3">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest">Contact</p>
-                          <p className="text-sm text-[#1A1035]">{ch.contact_name}</p>
-                        </div>
-                        <a href={`tel:${ch.contact_phone.replace(/\s/g, "")}`}
-                          className="text-xs text-white bg-[#7A4AED] px-3 py-2 rounded-xl font-semibold shadow-sm active:scale-95 transition-transform">
-                          📞 Appeler
-                        </a>
+                        <p className="text-xl font-bold tabular-nums">{ch.start_time} – {ch.end_time}</p>
+                        <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full font-semibold">{ch.position}/8</span>
+                      </div>
+                      <p className="text-sm opacity-90 mt-0.5">{ch.format} · {ch.prize}</p>
+                    </div>
+
+                    <div className="px-4 py-3 border-b border-[#E8E2F4]">
+                      <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.challenge_description}</p>
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                        {ch.skills.map((s) => (
+                          <span key={s} className="text-[10px] bg-[#F3F0FA] text-[#7A4AED] px-2 py-0.5 rounded-md font-medium">{s}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ── SECTION 2 : Preparation ── */}
+                    {(ch.briefing_notes || ch.tips.length > 0) && (
+                      <div className="px-4 py-3 border-b border-[#E8E2F4] space-y-2.5">
+                        <p className="text-[11px] font-bold text-[#7A4AED] uppercase tracking-wider">Preparation</p>
+
+                        {ch.briefing_notes && (
+                          <div className="rounded-xl bg-[#FFE3E8] px-3 py-2.5">
+                            <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.briefing_notes}</p>
+                          </div>
+                        )}
+
+                        {ch.tips.length > 0 && (
+                          <ul className="space-y-1">
+                            {ch.tips.map((t, ti) => (
+                              <li key={ti} className="text-[13px] leading-snug pl-4 relative text-[#1A1035]/80">
+                                <span className="absolute left-0 text-[#7A4AED]">•</span>{t}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     )}
 
-                    {/* Transport */}
+                    {/* ── SECTION 3 : Sur place ── */}
+                    <div className="px-4 py-3 border-b border-[#E8E2F4] space-y-2.5">
+                      <p className="text-[11px] font-bold text-[#7A4AED] uppercase tracking-wider">Sur place</p>
+
+                      <a href={mapsLink(ch.address)} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 rounded-xl bg-[#F3F0FA] px-3 py-2.5 active:scale-[0.98] transition-transform">
+                        <span className="text-base">📍</span>
+                        <span className="text-sm text-[#1A1035] flex-1">{ch.address}</span>
+                        <span className="text-[10px] text-[#7A4AED] font-semibold shrink-0">Ouvrir</span>
+                      </a>
+
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] text-[#7C6FA0] uppercase tracking-wider font-semibold">Jury</p>
+                          <p className="text-xs text-[#1A1035]/70 mt-0.5">{ch.jury.join(" · ")}</p>
+                        </div>
+                      </div>
+
+                      {ch.contact_name && ch.contact_phone && (
+                        <a href={`tel:${ch.contact_phone.replace(/\s/g, "")}`}
+                          className="flex items-center gap-2 rounded-xl bg-[#F3F0FA] px-3 py-2.5 active:scale-[0.98] transition-transform">
+                          <span className="text-base">📞</span>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-[#1A1035]">{ch.contact_name}</p>
+                            <p className="text-[10px] text-[#7C6FA0]">{ch.contact_phone}</p>
+                          </div>
+                          <span className="text-[10px] text-[#7A4AED] font-semibold shrink-0">Appeler</span>
+                        </a>
+                      )}
+                    </div>
+
+                    {/* ── SECTION 4 : Apres ── */}
                     {ch.transport_to_next && (
-                      <div className="rounded-xl bg-[#F3F0FA] p-3">
-                        <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest mb-0.5">Vers le prochain atelier</p>
-                        <p className="text-[13px] leading-relaxed text-[#1A1035]">{ch.transport_to_next}</p>
+                      <div className="px-4 py-3">
+                        <p className="text-[11px] font-bold text-[#7A4AED] uppercase tracking-wider mb-2">Ensuite</p>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-base shrink-0">🚶</div>
+                          <p className="text-sm text-[#1A1035] flex-1">{ch.transport_to_next}</p>
+                        </div>
                         {ch.directions_url && (
                           <a href={ch.directions_url} target="_blank" rel="noopener noreferrer"
-                            className="mt-2 flex items-center justify-center gap-2 h-10 bg-[#7A4AED] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform">
-                            📍 Itineraire
+                            className="mt-2.5 flex items-center justify-center gap-2 h-10 bg-[#7A4AED] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform">
+                            📍 Voir l'itineraire
                           </a>
                         )}
                       </div>
