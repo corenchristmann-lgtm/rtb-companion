@@ -30,7 +30,7 @@ export function PlanningScreen({ timer, focusId, onClearFocus }: Props) {
   return (
     <div ref={scrollRef} className="px-4 pt-6 pb-4 max-w-lg mx-auto">
       <h1 className="text-lg font-bold text-[#1A1035] mb-0.5">Planning</h1>
-      <p className="text-[11px] text-muted-foreground mb-5">8 challenges · 08h45 – 17h00 · Liège</p>
+      <p className="text-[11px] text-muted-foreground mb-5">Lundi 13 avril · 8 challenges · 08h45 – 17h00 · Liège</p>
 
       <div className="relative">
         <div className="absolute left-[19px] top-4 bottom-4 w-px bg-[#E8E2F4]" />

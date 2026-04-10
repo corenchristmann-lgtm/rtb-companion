@@ -21,6 +21,68 @@ export function NowScreen({ timer, onOpenChallenge }: Props) {
 
   const togglePanel = (p: "tips" | "checklist") => setPanel(panel === p ? "none" : p);
 
+  // Pre-event countdown screen
+  if (!timer.isEventDay && !timer.isManualOverride) {
+    return (
+      <div className="px-4 pt-10 pb-4 max-w-lg mx-auto text-center space-y-6">
+        <div>
+          <h1 className="text-lg font-bold text-[#1A1035]">Road-to-Business</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Équipe 1 · Corentin Christmann</p>
+        </div>
+
+        <div className="py-6">
+          <p className="text-6xl font-extrabold text-[#7A4AED] timer-display">
+            {timer.daysUntilEvent > 0 ? `J-${timer.daysUntilEvent}` : "✓"}
+          </p>
+          <p className="text-sm text-muted-foreground mt-3">{timer.label}</p>
+          <p className="text-xs text-muted-foreground mt-1">Lundi 13 avril 2026 · Liège</p>
+        </div>
+
+        {/* Preview: browse challenges */}
+        <div className="rounded-2xl border border-[#E8E2F4] bg-white p-4 shadow-sm text-left">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Aperçu des challenges</p>
+          <div className="space-y-2">
+            {CHALLENGES.map((c) => (
+              <button key={c.id} onClick={() => onOpenChallenge(c.id)}
+                className="w-full flex items-center gap-2.5 py-1.5 active:scale-[0.98] transition-transform">
+                <CompanyLogo src={c.emoji ?? ""} company={c.company} size={30} />
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-semibold text-[#1A1035] truncate">{c.company}</p>
+                  <p className="text-[10px] text-muted-foreground">{c.start_time} · {c.format}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Contacts */}
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          {CONTACTS.map((c) => (
+            <a key={c.name}
+              href={c.phone.startsWith("+") ? `tel:${c.phone.replace(/\s/g, "")}` : undefined}
+              className="shrink-0 rounded-xl border border-[#E8E2F4] bg-white px-3.5 py-2.5 min-w-[130px] shadow-sm text-left">
+              <p className="text-xs font-semibold text-[#1A1035]">{c.name}</p>
+              <p className="text-[10px] text-muted-foreground">{c.role}</p>
+              {c.phone.startsWith("+") && <p className="text-[10px] text-[#7A4AED] mt-0.5 font-medium">{c.phone}</p>}
+            </a>
+          ))}
+        </div>
+
+        {/* Rules */}
+        <div className="rounded-2xl border border-[#F46277]/20 bg-[#FFE3E8]/50 p-4 text-left">
+          <p className="text-[10px] font-bold text-[#F46277] uppercase tracking-widest mb-2">Rappels</p>
+          <ul className="space-y-1">
+            {["Aucun retard toléré", "Présenter toutes les épreuves", "Tenue professionnelle", "Toujours présenter le projet en premier"].map((r, i) => (
+              <li key={i} className="text-xs text-[#1A1035]/60 pl-3 relative">
+                <span className="absolute left-0 text-[#F46277]/50">–</span>{r}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-5">
 
