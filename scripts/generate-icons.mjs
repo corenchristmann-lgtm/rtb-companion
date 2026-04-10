@@ -6,7 +6,7 @@ const brandmark = "public/logos/brandmark.png";
 
 async function generate(size, output) {
   // Create pink background with brandmark centered (with padding)
-  const padding = Math.round(size * 0.03);
+  const padding = 0;
   const logoSize = size - padding * 2;
 
   const resizedLogo = await sharp(brandmark)
