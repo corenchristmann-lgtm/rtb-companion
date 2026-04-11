@@ -161,6 +161,15 @@ function getAllRoutePairs(): [string, string][] {
   const pairs: [string, string][] = [];
 
   for (const team of TEAMS) {
+    // Route from OPRL to first atelier
+    const firstLocId = ATELIER_TO_LOCATION[team.schedule[0].atelier_id];
+    const oprlKey = `oprl->${firstLocId}`;
+    if (!seen.has(oprlKey)) {
+      seen.add(oprlKey);
+      pairs.push(["oprl", firstLocId]);
+    }
+
+    // Routes between ateliers
     for (let i = 0; i < team.schedule.length - 1; i++) {
       const fromLoc = ATELIER_TO_LOCATION[team.schedule[i].atelier_id];
       const toLoc = ATELIER_TO_LOCATION[team.schedule[i + 1].atelier_id];
@@ -177,7 +186,7 @@ function getAllRoutePairs(): [string, string][] {
 
 // ── Cache + load ──
 
-const LS_KEY = "rtb-routes-cache-v3";
+const LS_KEY = "rtb-routes-cache-v4";
 
 export type RoutesMap = Record<string, LatLng[]>;
 

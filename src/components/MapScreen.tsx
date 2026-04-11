@@ -28,8 +28,39 @@ interface TeamPosition {
   status: string;
 }
 
+const OPRL = LOCATIONS.oprl;
+const GATHERING_TIME = 7 * 3600 + 50 * 60; // 07:50 — rassemblement OPRL
+
 function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number, routes: RoutesMap): TeamPosition {
   const color = TEAM_COLORS[(team.id - 1) % TEAM_COLORS.length];
+
+  const firstSlot = team.schedule[0];
+  const firstLocId = ATELIER_TO_LOCATION[firstSlot.atelier_id];
+  const firstLoc = LOCATIONS[firstLocId];
+  const firstStart = timeToSeconds(firstSlot.start_time);
+
+  // Before first challenge: at OPRL or in transit to first atelier
+  if (nowSeconds < firstStart) {
+    // Depart OPRL ~15 min before first challenge start (or at gathering time if close)
+    const departTime = Math.max(GATHERING_TIME, firstStart - 15 * 60);
+
+    if (nowSeconds < departTime) {
+      // Still at OPRL
+      return { teamId: team.id, teamName: team.name, color, lat: OPRL.lat, lng: OPRL.lng, status: "Rassemblement OPRL" };
+    }
+
+    // In transit from OPRL to first atelier
+    const progress = (nowSeconds - departTime) / (firstStart - departTime);
+    const routeKey = `oprl->${firstLocId}`;
+    const route = routes[routeKey];
+    if (route && route.length > 1) {
+      const [lat, lng] = interpolateAlongRoute(route, progress);
+      return { teamId: team.id, teamName: team.name, color, lat, lng, status: `En route vers ${firstLoc.company}` };
+    }
+    const lat = OPRL.lat + (firstLoc.lat - OPRL.lat) * progress;
+    const lng = OPRL.lng + (firstLoc.lng - OPRL.lng) * progress;
+    return { teamId: team.id, teamName: team.name, color, lat, lng, status: `En route vers ${firstLoc.company}` };
+  }
 
   for (let i = 0; i < team.schedule.length; i++) {
     const slot = team.schedule[i];
@@ -37,11 +68,6 @@ function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number, routes: Rout
     const loc = LOCATIONS[locId];
     const start = timeToSeconds(slot.start_time);
     const end = timeToSeconds(slot.end_time);
-
-    // Before first challenge
-    if (i === 0 && nowSeconds < start) {
-      return { teamId: team.id, teamName: team.name, color, lat: loc.lat, lng: loc.lng, status: `En attente — ${loc.company}` };
-    }
 
     // During this challenge
     if (nowSeconds >= start && nowSeconds < end) {
@@ -131,10 +157,9 @@ export function MapScreen({ currentTeamId }: Props) {
     const isEventDay = today === EVENT_DATE;
 
     if (!isEventDay) {
+      const oprl = LOCATIONS.oprl;
       const pos = TEAMS.map((t) => {
-        const firstLocId = ATELIER_TO_LOCATION[t.schedule[0].atelier_id];
-        const loc = LOCATIONS[firstLocId];
-        return { teamId: t.id, teamName: t.name, color: TEAM_COLORS[(t.id - 1) % TEAM_COLORS.length], lat: loc.lat, lng: loc.lng, status: `Premier arret : ${loc.company}` };
+        return { teamId: t.id, teamName: t.name, color: TEAM_COLORS[(t.id - 1) % TEAM_COLORS.length], lat: oprl.lat, lng: oprl.lng, status: "Depart : OPRL Boulevard Piercot" };
       });
       setPositions(pos);
       return;
