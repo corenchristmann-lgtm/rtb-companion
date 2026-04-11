@@ -35,7 +35,7 @@ const GATHERING_TIME = 7 * 3600 + 50 * 60; // 07:50 — rassemblement OPRL
 // Arranged in a circle pattern around the center point
 function teamOffset(teamId: number): [number, number] {
   const angle = ((teamId - 1) / 9) * 2 * Math.PI - Math.PI / 2;
-  const r = 0.00035; // ~35m radius
+  const r = 0.0001; // ~10m radius
   return [Math.sin(angle) * r, Math.cos(angle) * r];
 }
 
