@@ -18,7 +18,16 @@ export default function Home() {
   const challenges = useMemo(() => team ? teamChallenges(team) : [], [team]);
   const timer = useTimer(challenges);
 
-  if (!loaded) return null;
+  if (!loaded) return (
+    <div className="flex flex-col items-center justify-center h-dvh bg-gradient-to-b from-[#F3F0FA] via-[#FFF5F7] to-white">
+      <div className="w-16 h-16 rounded-2xl bg-white shadow-lg shadow-primary/10 flex items-center justify-center animate-breathe">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7A4AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <p className="mt-4 text-sm font-semibold text-muted-foreground animate-pulse">Chargement...</p>
+    </div>
+  );
   if (!team) return <TeamSelector onSelect={selectTeam} />;
 
   return (

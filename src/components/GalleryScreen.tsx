@@ -54,11 +54,11 @@ export function GalleryScreen({ teamName }: Props) {
   }, [pendingPreview]);
 
   return (
-    <div className="px-4 pt-6 pb-4 max-w-lg mx-auto space-y-4">
+    <div className="px-4 pt-5 pb-4 max-w-lg mx-auto space-y-4">
       {/* Header */}
       <div className="text-center">
         <h1 className="text-lg font-bold text-[#1A1035]">Galerie Photos</h1>
-        <p className="text-[11px] text-[#7C6FA0] mt-0.5">Photos partagees entre toutes les equipes</p>
+        <p className="text-[11px] text-[#5A4D80] mt-1">Photos partagees entre toutes les equipes</p>
       </div>
 
       {/* Take photo button */}
@@ -99,18 +99,18 @@ export function GalleryScreen({ teamName }: Props) {
       {/* Team filter */}
       <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
         <button onClick={() => setFilter(null)}
-          className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-[background-color,color] duration-200 pressable ${
-            filter === null ? "bg-[#7A4AED] text-white" : "bg-[#F3F0FA] text-[#7C6FA0]"
+          className={`shrink-0 px-3.5 min-h-[44px] rounded-full text-[11px] font-semibold transition-[background-color,color] duration-200 pressable ${
+            filter === null ? "bg-[#7A4AED] text-white" : "bg-[#F3F0FA] text-[#5A4D80]"
           }`}
-          style={{ transitionTimingFunction: "var(--ease-out)" }}>
+>
           Toutes
         </button>
         {TEAM_NAMES.map((name) => (
           <button key={name} onClick={() => setFilter(filter === name ? null : name)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-[background-color,color] duration-200 pressable ${
-              filter === name ? "bg-[#7A4AED] text-white" : "bg-[#F3F0FA] text-[#7C6FA0]"
+            className={`shrink-0 px-3.5 min-h-[44px] rounded-full text-[11px] font-semibold transition-[background-color,color] duration-200 pressable ${
+              filter === name ? "bg-[#7A4AED] text-white" : "bg-[#F3F0FA] text-[#5A4D80]"
             }`}
-            style={{ transitionTimingFunction: "var(--ease-out)" }}>
+  >
             {name}
           </button>
         ))}
@@ -118,7 +118,7 @@ export function GalleryScreen({ teamName }: Props) {
 
       {/* Photo count */}
       {!loading && (
-        <p className="text-[10px] text-[#7C6FA0] text-center">
+        <p className="text-[11px] text-[#5A4D80] text-center">
           {filtered.length} photo{filtered.length !== 1 ? "s" : ""} · mise a jour auto
         </p>
       )}
@@ -140,13 +140,13 @@ export function GalleryScreen({ teamName }: Props) {
             <button key={photo.id} onClick={() => setViewPhoto(photo)}
               className="relative aspect-square rounded-xl overflow-hidden bg-[#F3F0FA] text-left animate-photo-in pressable"
               style={{ animationDelay: `${Math.min(i * 40, 400)}ms` }}>
-              <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+              <img src={photo.url} alt={photo.caption || `Photo par ${photo.team_name || "une equipe"}`} className="w-full h-full object-cover" loading="lazy" />
               <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1.5">
                 {photo.team_name && (
-                  <p className="text-[9px] text-white font-semibold truncate">{photo.team_name}</p>
+                  <p className="text-[10px] text-white font-semibold truncate">{photo.team_name}</p>
                 )}
                 {photo.caption && (
-                  <p className="text-[8px] text-white/70 truncate">{photo.caption}</p>
+                  <p className="text-[10px] text-white/70 truncate">{photo.caption}</p>
                 )}
               </div>
             </button>
@@ -164,6 +164,12 @@ export function GalleryScreen({ teamName }: Props) {
 
 function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: string; onClose: () => void }) {
   const { reactions, addReaction } = usePhotoReactions(photo.id);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
 
   const downloadPhoto = async () => {
     try {
@@ -194,10 +200,11 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
   });
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center animate-backdrop-in" onClick={onClose}>
+    <div role="dialog" aria-modal="true" aria-label="Photo en plein ecran" className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center animate-backdrop-in" onClick={onClose}>
       {/* Close button */}
       <button onClick={onClose}
-        className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center pressable"
+        aria-label="Fermer"
+        className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center pressable"
         style={{ transitionTimingFunction: "var(--ease-out)" }}>
         ✕
       </button>
@@ -205,14 +212,15 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
       {/* Download button */}
       <div className="absolute top-4 left-4 z-10" onClick={(e) => e.stopPropagation()}>
         <button onClick={downloadPhoto}
-          className="w-8 h-8 rounded-full bg-white/10 text-white/60 text-xs flex items-center justify-center pressable"
-          style={{ transitionTimingFunction: "var(--ease-out)" }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          aria-label="Telecharger la photo"
+          className="w-11 h-11 rounded-full bg-white/10 text-white/60 flex items-center justify-center pressable"
+>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
       </div>
 
       {/* Photo — cinematic entrance from scale(0.95) */}
-      <img src={photo.url} alt="" className="max-w-[90%] max-h-[50vh] object-contain rounded-lg animate-lightbox-in" onClick={onClose} />
+      <img src={photo.url} alt={photo.caption || `Photo par ${photo.team_name || "une equipe"}`} className="max-w-[90%] max-h-[50vh] object-contain rounded-lg animate-lightbox-in" onClick={onClose} />
 
       {/* Caption + team */}
       <div className="text-center mt-3 px-4 animate-fade-in" style={{ animationDelay: "100ms" }}>
@@ -229,15 +237,13 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
         <div className="flex justify-center gap-2">
           {grouped.map(({ emoji, count, myTeam }, i) => (
             <button key={emoji} onClick={() => addReaction(emoji, teamName)}
+              aria-label={`Reagir avec ${emoji}`}
               className={`flex items-center gap-1 px-3 py-2 rounded-2xl text-lg pressable transition-[background-color,box-shadow] duration-200 animate-slide-up ${
                 myTeam
                   ? "bg-[#7A4AED]/30 ring-1 ring-[#7A4AED]"
                   : "bg-white/10"
               }`}
-              style={{
-                animationDelay: `${150 + i * 40}ms`,
-                transitionTimingFunction: "var(--ease-out)",
-              }}>
+              style={{ animationDelay: `${150 + i * 40}ms` }}>
               <span>{emoji}</span>
               {count > 0 && (
                 <span className="text-xs text-white/80 font-semibold">{count}</span>

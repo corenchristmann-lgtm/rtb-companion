@@ -7,6 +7,7 @@ import type { Team } from "@/lib/teams";
 import { formatTime } from "@/hooks/useTimer";
 import { usePhotos } from "@/hooks/useSupabase";
 import { CompanyLogo } from "./CompanyLogo";
+import { ChecklistTab } from "./ChecklistTab";
 
 interface Challenge {
   id: number; position: number; company: string; emoji: string | null;
@@ -53,7 +54,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
     <div className="px-4 pt-5 pb-4 max-w-lg mx-auto space-y-4">
       {/* Header */}
       <div className="relative">
-        <button onClick={onLogout} className="absolute right-0 top-0 text-[11px] text-[#7C6FA0]/60 transition-colors duration-200 pressable" style={{ transitionTimingFunction: "var(--ease-out)" }}>
+        <button onClick={() => { if (confirm("Changer d'equipe ? Tu perdras ta selection actuelle.")) onLogout(); }} className="absolute right-0 top-0 text-[11px] text-[#5A4D80]/70 transition-colors duration-200 pressable">
           Changer d'equipe
         </button>
         <div className="flex justify-center">
@@ -123,7 +124,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
 
       {/* 8 Challenges */}
       <div className="rounded-2xl bg-white border border-[#E8E2F4]/60 p-4 shadow-sm">
-        <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest mb-3">
+        <p className="text-[11px] font-bold text-[#5A4D80] uppercase tracking-widest mb-3">
           Vos 8 challenges
         </p>
         <div className="space-y-0.5">
@@ -136,9 +137,11 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
               <div key={ch.id} ref={isActive ? activeRef : undefined} className="animate-stagger">
                 <div className={`flex items-center gap-2 rounded-2xl transition-[background-color,border-color,padding,margin,box-shadow] duration-200 ${
                   isActive ? "bg-[#7A4AED]/8 border border-[#7A4AED]/25 p-1.5 -mx-1.5 shadow-sm" : "p-0.5"
-                }`} style={{ transitionTimingFunction: "var(--ease-out)" }}>
+                }`}>
                   <button
                     onClick={() => setExpandedId(isExpanded ? null : ch.id)}
+                    aria-expanded={isExpanded}
+                    aria-label={`${ch.company} — ${ch.start_time} a ${ch.end_time}`}
                     className={`flex-1 flex items-center gap-2.5 py-2 rounded-xl px-2 pressable ${
                       isDone ? "opacity-40" : ""
                     }`}
@@ -148,7 +151,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
                       <div className="flex items-center gap-2">
                         <p className={`font-semibold truncate ${isActive ? "text-sm text-[#7A4AED]" : "text-[13px] text-[#1A1035]"}`}>{ch.company}</p>
                         {isActive && (
-                          <span className="text-[7px] font-bold text-white bg-[#7A4AED] px-1.5 py-0.5 rounded-full shrink-0 animate-breathe uppercase tracking-wider">
+                          <span className="text-[9px] font-bold text-white bg-[#7A4AED] px-2 py-0.5 rounded-full shrink-0 animate-breathe uppercase tracking-wider">
                             En cours
                           </span>
                         )}
@@ -164,14 +167,14 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
                       </p>
                     </div>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C6FA0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                      className={`shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-                    style={{ transitionTimingFunction: "var(--ease-out)" }}>
+                      className={`shrink-0 transition-transform duration-200 ease-custom ${isExpanded ? "rotate-180" : ""}`}>
                       <polyline points="6 9 12 15 18 9"/>
                     </svg>
                   </button>
 
                   <a href={mapsLink(ch.address)} target="_blank" rel="noopener noreferrer"
-                    className="shrink-0 w-8 h-8 rounded-lg bg-[#F3F0FA] flex items-center justify-center text-sm pressable">
+                    className="shrink-0 w-11 h-11 rounded-xl bg-[#F3F0FA] flex items-center justify-center text-sm pressable"
+                    aria-label={`Localiser ${ch.company} sur la carte`}>
                     📍
                   </a>
                 </div>
@@ -247,20 +250,27 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
 
                     {/* Section 4 : Apres */}
                     {ch.transport_to_next && (
-                      <div className="px-4 py-3">
+                      <div className="px-4 py-3 border-b border-[#E8E2F4]/60">
                         <p className="text-[11px] font-bold text-[#7A4AED] uppercase tracking-wider mb-2">Ensuite</p>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-sm shrink-0 border border-amber-100">🚶</div>
+                          <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-sm shrink-0 border border-amber-100" aria-hidden="true">🚶</div>
                           <p className="text-[13px] text-[#1A1035] flex-1">{ch.transport_to_next}</p>
                         </div>
                         {ch.directions_url && (
                           <a href={ch.directions_url} target="_blank" rel="noopener noreferrer"
-                            className="mt-2.5 flex items-center justify-center gap-2 h-10 bg-gradient-to-r from-[#7A4AED] to-[#9B73F2] text-white rounded-xl text-xs font-semibold pressable shadow-sm shadow-[#7A4AED]/15">
+                            className="mt-2.5 flex items-center justify-center gap-2 h-10 bg-gradient-to-r from-[#7A4AED] to-[#9B73F2] text-white rounded-xl text-xs font-semibold pressable shadow-sm shadow-[#7A4AED]/15"
+                            aria-label={`Itineraire vers ${challenges[i + 1]?.company ?? "la prochaine etape"}`}>
                             📍 Voir l'itineraire
                           </a>
                         )}
                       </div>
                     )}
+
+                    {/* Section 5 : Checklist */}
+                    <div className="px-4 py-3">
+                      <p className="text-[11px] font-bold text-[#7A4AED] uppercase tracking-wider mb-2">Checklist</p>
+                      <ChecklistTab challengeId={ch.id} />
+                    </div>
                   </div>
                 )}
               </div>
@@ -279,15 +289,14 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
 
       {/* Contacts */}
       <div className="space-y-2.5">
-        <p className="text-[10px] font-bold text-[#7C6FA0] uppercase tracking-widest">
+        <p className="text-[11px] font-bold text-[#5A4D80] uppercase tracking-widest">
           Contacts importants
         </p>
         <div className="grid grid-cols-2 gap-2.5">
           {CONTACTS.map((c) => (
             <a key={c.name}
               href={c.phone.startsWith("+") ? `tel:${c.phone.replace(/\s/g, "")}` : undefined}
-              className="rounded-2xl bg-white border border-[#E8E2F4]/60 p-3.5 shadow-sm pressable"
-              style={{ transitionTimingFunction: "var(--ease-out)" }}>
+              className="rounded-2xl bg-white border border-[#E8E2F4]/60 p-3.5 shadow-sm pressable">
               <p className="text-sm font-bold text-[#1A1035]">{c.name}</p>
               <p className="text-[10px] text-[#7C6FA0] mt-0.5">{c.role}</p>
               <p className="text-xs text-[#7A4AED] font-semibold mt-2">{c.phone}</p>

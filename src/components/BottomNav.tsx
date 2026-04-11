@@ -11,33 +11,30 @@ const items: { id: Tab; label: string; icon: string }[] = [
 export function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-50 border-t border-[#E8E2F4]/80 bg-white/90 backdrop-blur-2xl">
-      <div className="flex justify-around max-w-lg mx-auto px-4 py-2">
+      <div role="tablist" className="flex justify-around max-w-lg mx-auto px-4 py-2.5">
         {items.map((item) => {
           const isActive = active === item.id;
           return (
             <button key={item.id} onClick={() => onChange(item.id)}
-              className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl pressable"
-              style={{ transitionTimingFunction: "var(--ease-out)" }}>
+              role="tab"
+              aria-selected={isActive}
+              className="flex flex-col items-center gap-0.5 px-5 py-1.5 min-h-[44px] rounded-xl pressable">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth={isActive ? "2.2" : "1.8"}
                 strokeLinecap="round" strokeLinejoin="round"
-                className="transition-[color,stroke-width] duration-200"
-                style={{
-                  color: isActive ? "#7A4AED" : "rgba(124,111,160,0.6)",
-                  transitionTimingFunction: "var(--ease-out)",
-                }}>
+                aria-hidden="true"
+                className="transition-[color,stroke-width] duration-200 ease-custom"
+                style={{ color: isActive ? "#7A4AED" : "#6B5E8A" }}>
                 <path d={item.icon} />
               </svg>
               <span
-                className="text-[10px] font-semibold transition-colors duration-200"
-                style={{
-                  color: isActive ? "#7A4AED" : "rgba(124,111,160,0.6)",
-                  transitionTimingFunction: "var(--ease-out)",
-                }}>
+                className="text-[10px] font-semibold transition-colors duration-200 ease-custom"
+                style={{ color: isActive ? "#7A4AED" : "#6B5E8A" }}>
                 {item.label}
               </span>
               <div
-                className="w-1 h-1 rounded-full bg-[#7A4AED] -mt-0.5 transition-[opacity,transform] duration-200"
+                className="w-1.5 h-1.5 rounded-full bg-[#7A4AED] -mt-0.5 transition-[opacity,transform] duration-200"
+                aria-hidden="true"
                 style={{
                   opacity: isActive ? 1 : 0,
                   transform: isActive ? "scale(1)" : "scale(0)",
