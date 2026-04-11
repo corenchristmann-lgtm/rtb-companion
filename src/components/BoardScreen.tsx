@@ -53,7 +53,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
     <div className="px-4 pt-5 pb-4 max-w-lg mx-auto space-y-4">
       {/* Header */}
       <div className="relative">
-        <button onClick={onLogout} className="absolute right-0 top-0 text-[11px] text-[#7C6FA0]/60 hover:text-[#7C6FA0] transition-colors">
+        <button onClick={onLogout} className="absolute right-0 top-0 text-[11px] text-[#7C6FA0]/60 transition-colors duration-200 pressable" style={{ transitionTimingFunction: "var(--ease-out)" }}>
           Changer d'equipe
         </button>
         <div className="flex justify-center">
@@ -133,13 +133,13 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
             const isExpanded = expandedId === ch.id;
 
             return (
-              <div key={ch.id} ref={isActive ? activeRef : undefined}>
-                <div className={`flex items-center gap-2 rounded-2xl transition-all ${
+              <div key={ch.id} ref={isActive ? activeRef : undefined} className="animate-stagger">
+                <div className={`flex items-center gap-2 rounded-2xl transition-[background-color,border-color,padding,margin,box-shadow] duration-200 ${
                   isActive ? "bg-[#7A4AED]/8 border border-[#7A4AED]/25 p-1.5 -mx-1.5 shadow-sm" : "p-0.5"
-                }`}>
+                }`} style={{ transitionTimingFunction: "var(--ease-out)" }}>
                   <button
                     onClick={() => setExpandedId(isExpanded ? null : ch.id)}
-                    className={`flex-1 flex items-center gap-2.5 py-2 rounded-xl px-2 active:scale-[0.98] transition-all ${
+                    className={`flex-1 flex items-center gap-2.5 py-2 rounded-xl px-2 pressable ${
                       isDone ? "opacity-40" : ""
                     }`}
                   >
@@ -164,13 +164,14 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
                       </p>
                     </div>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7C6FA0" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                      className={`shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`}>
+                      className={`shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                    style={{ transitionTimingFunction: "var(--ease-out)" }}>
                       <polyline points="6 9 12 15 18 9"/>
                     </svg>
                   </button>
 
                   <a href={mapsLink(ch.address)} target="_blank" rel="noopener noreferrer"
-                    className="shrink-0 w-8 h-8 rounded-lg bg-[#F3F0FA] flex items-center justify-center text-sm active:scale-90 transition-transform">
+                    className="shrink-0 w-8 h-8 rounded-lg bg-[#F3F0FA] flex items-center justify-center text-sm pressable">
                     📍
                   </a>
                 </div>
@@ -222,7 +223,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
                     <div className="px-4 py-3 border-b border-[#E8E2F4]/60 space-y-2">
                       <p className="text-[11px] font-bold text-[#7A4AED] uppercase tracking-wider">Sur place</p>
                       <a href={mapsLink(ch.address)} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-2.5 rounded-xl bg-[#F3F0FA]/70 px-3 py-2.5 active:scale-[0.98] transition-transform border border-[#E8E2F4]/40">
+                        className="flex items-center gap-2.5 rounded-xl bg-[#F3F0FA]/70 px-3 py-2.5 pressable border border-[#E8E2F4]/40">
                         <span className="text-base">📍</span>
                         <span className="text-[13px] text-[#1A1035] flex-1">{ch.address}</span>
                         <span className="text-[10px] text-[#7A4AED] font-semibold shrink-0">Ouvrir →</span>
@@ -233,7 +234,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
                       </div>
                       {ch.contact_name && ch.contact_phone && (
                         <a href={`tel:${ch.contact_phone.replace(/\s/g, "")}`}
-                          className="flex items-center gap-2.5 rounded-xl bg-[#F3F0FA]/70 px-3 py-2.5 active:scale-[0.98] transition-transform border border-[#E8E2F4]/40">
+                          className="flex items-center gap-2.5 rounded-xl bg-[#F3F0FA]/70 px-3 py-2.5 pressable border border-[#E8E2F4]/40">
                           <span className="text-base">📞</span>
                           <div className="flex-1">
                             <p className="text-[13px] font-medium text-[#1A1035]">{ch.contact_name}</p>
@@ -254,7 +255,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
                         </div>
                         {ch.directions_url && (
                           <a href={ch.directions_url} target="_blank" rel="noopener noreferrer"
-                            className="mt-2.5 flex items-center justify-center gap-2 h-10 bg-gradient-to-r from-[#7A4AED] to-[#9B73F2] text-white rounded-xl text-xs font-semibold active:scale-95 transition-transform shadow-sm shadow-[#7A4AED]/15">
+                            className="mt-2.5 flex items-center justify-center gap-2 h-10 bg-gradient-to-r from-[#7A4AED] to-[#9B73F2] text-white rounded-xl text-xs font-semibold pressable shadow-sm shadow-[#7A4AED]/15">
                             📍 Voir l'itineraire
                           </a>
                         )}
@@ -285,7 +286,8 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
           {CONTACTS.map((c) => (
             <a key={c.name}
               href={c.phone.startsWith("+") ? `tel:${c.phone.replace(/\s/g, "")}` : undefined}
-              className="rounded-2xl bg-white border border-[#E8E2F4]/60 p-3.5 shadow-sm active:scale-[0.97] transition-all hover:shadow-md">
+              className="rounded-2xl bg-white border border-[#E8E2F4]/60 p-3.5 shadow-sm pressable"
+              style={{ transitionTimingFunction: "var(--ease-out)" }}>
               <p className="text-sm font-bold text-[#1A1035]">{c.name}</p>
               <p className="text-[10px] text-[#7C6FA0] mt-0.5">{c.role}</p>
               <p className="text-xs text-[#7A4AED] font-semibold mt-2">{c.phone}</p>
@@ -296,7 +298,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
 
       {/* Quick photo */}
       <button onClick={() => fileRef.current?.click()} disabled={uploading}
-        className="w-full h-11 rounded-2xl bg-white border border-[#E8E2F4]/60 text-sm font-medium text-[#7C6FA0] shadow-sm active:scale-[0.98] transition-all hover:shadow-md disabled:opacity-50">
+        className="w-full h-11 rounded-2xl bg-white border border-[#E8E2F4]/60 text-sm font-medium text-[#7C6FA0] shadow-sm pressable disabled:opacity-50">
         {uploading ? "Envoi..." : "📷 Prendre une photo"}
       </button>
       <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} />
@@ -305,12 +307,12 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
       {isEventDay && (
         <div className="flex gap-2">
           <button onClick={timer.goPrev} disabled={timer.currentChallengeIndex === 0}
-            className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4]/60 text-xs font-semibold text-[#1A1035] disabled:opacity-20 active:scale-95 transition-transform shadow-sm">
+            className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4]/60 text-xs font-semibold text-[#1A1035] disabled:opacity-20 pressable shadow-sm">
             ← Prec.
           </button>
           {timer.status === "active" && (
             <button onClick={timer.goNext}
-              className="h-11 px-4 rounded-xl bg-emerald-500 text-white text-xs font-semibold active:scale-95 transition-transform shadow-sm">
+              className="h-11 px-4 rounded-xl bg-emerald-500 text-white text-xs font-semibold pressable shadow-sm">
               Termine ✓
             </button>
           )}
@@ -318,7 +320,7 @@ export function BoardScreen({ timer, challenges, team, onLogout }: Props) {
             <button onClick={timer.resetToAuto} className="h-11 px-3 rounded-xl bg-[#F3F0FA] text-[#7A4AED] text-xs font-semibold">Auto</button>
           )}
           <button onClick={timer.goNext} disabled={timer.currentChallengeIndex === challenges.length - 1}
-            className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4]/60 text-xs font-semibold text-[#1A1035] disabled:opacity-20 active:scale-95 transition-transform shadow-sm">
+            className="flex-1 h-11 rounded-xl bg-white border border-[#E8E2F4]/60 text-xs font-semibold text-[#1A1035] disabled:opacity-20 pressable shadow-sm">
             Suiv. →
           </button>
         </div>

@@ -16,21 +16,34 @@ export function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab
           const isActive = active === item.id;
           return (
             <button key={item.id} onClick={() => onChange(item.id)}
-              className={`flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl transition-all ${
-                isActive ? "text-[#7A4AED]" : "text-[#7C6FA0]/60 active:text-[#7C6FA0]"
-              }`}>
+              className="flex flex-col items-center gap-0.5 px-4 py-1 rounded-xl pressable"
+              style={{ transitionTimingFunction: "var(--ease-out)" }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth={isActive ? "2.2" : "1.8"}
                 strokeLinecap="round" strokeLinejoin="round"
-                className="transition-all">
+                className="transition-[color,stroke-width] duration-200"
+                style={{
+                  color: isActive ? "#7A4AED" : "rgba(124,111,160,0.6)",
+                  transitionTimingFunction: "var(--ease-out)",
+                }}>
                 <path d={item.icon} />
               </svg>
-              <span className={`text-[10px] font-semibold ${isActive ? "text-[#7A4AED]" : ""}`}>
+              <span
+                className="text-[10px] font-semibold transition-colors duration-200"
+                style={{
+                  color: isActive ? "#7A4AED" : "rgba(124,111,160,0.6)",
+                  transitionTimingFunction: "var(--ease-out)",
+                }}>
                 {item.label}
               </span>
-              {isActive && (
-                <div className="w-1 h-1 rounded-full bg-[#7A4AED] -mt-0.5" />
-              )}
+              <div
+                className="w-1 h-1 rounded-full bg-[#7A4AED] -mt-0.5 transition-[opacity,transform] duration-200"
+                style={{
+                  opacity: isActive ? 1 : 0,
+                  transform: isActive ? "scale(1)" : "scale(0)",
+                  transitionTimingFunction: "var(--ease-spring)",
+                }}
+              />
             </button>
           );
         })}

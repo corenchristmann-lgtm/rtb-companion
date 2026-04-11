@@ -63,7 +63,7 @@ export function GalleryScreen({ teamName }: Props) {
 
       {/* Take photo button */}
       <button onClick={() => fileRef.current?.click()} disabled={uploading || !!pendingFile}
-        className="w-full h-14 rounded-2xl bg-[#7A4AED] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#7A4AED]/25 active:scale-[0.98] transition-transform disabled:opacity-50">
+        className="w-full h-14 rounded-2xl bg-[#7A4AED] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#7A4AED]/25 pressable disabled:opacity-50">
         {uploading ? (
           <span className="animate-pulse">Envoi en cours...</span>
         ) : (
@@ -85,11 +85,11 @@ export function GalleryScreen({ teamName }: Props) {
           />
           <div className="flex gap-2">
             <button onClick={cancelUpload}
-              className="flex-1 h-10 rounded-xl border border-[#E8E2F4] text-sm font-semibold text-[#7C6FA0] active:scale-95 transition-transform">
+              className="flex-1 h-10 rounded-xl border border-[#E8E2F4] text-sm font-semibold text-[#7C6FA0] pressable">
               Annuler
             </button>
             <button onClick={confirmUpload}
-              className="flex-1 h-10 rounded-xl bg-[#7A4AED] text-white text-sm font-semibold active:scale-95 transition-transform shadow-sm shadow-[#7A4AED]/20">
+              className="flex-1 h-10 rounded-xl bg-[#7A4AED] text-white text-sm font-semibold pressable shadow-sm shadow-[#7A4AED]/20">
               Publier
             </button>
           </div>
@@ -99,16 +99,18 @@ export function GalleryScreen({ teamName }: Props) {
       {/* Team filter */}
       <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
         <button onClick={() => setFilter(null)}
-          className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
+          className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-[background-color,color] duration-200 pressable ${
             filter === null ? "bg-[#7A4AED] text-white" : "bg-[#F3F0FA] text-[#7C6FA0]"
-          }`}>
+          }`}
+          style={{ transitionTimingFunction: "var(--ease-out)" }}>
           Toutes
         </button>
         {TEAM_NAMES.map((name) => (
           <button key={name} onClick={() => setFilter(filter === name ? null : name)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
+            className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-[background-color,color] duration-200 pressable ${
               filter === name ? "bg-[#7A4AED] text-white" : "bg-[#F3F0FA] text-[#7C6FA0]"
-            }`}>
+            }`}
+            style={{ transitionTimingFunction: "var(--ease-out)" }}>
             {name}
           </button>
         ))}
@@ -134,9 +136,10 @@ export function GalleryScreen({ teamName }: Props) {
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-1.5">
-          {filtered.map((photo) => (
+          {filtered.map((photo, i) => (
             <button key={photo.id} onClick={() => setViewPhoto(photo)}
-              className="relative aspect-square rounded-xl overflow-hidden bg-[#F3F0FA] text-left">
+              className="relative aspect-square rounded-xl overflow-hidden bg-[#F3F0FA] text-left animate-photo-in pressable"
+              style={{ animationDelay: `${Math.min(i * 40, 400)}ms` }}>
               <img src={photo.url} alt="" className="w-full h-full object-cover" loading="lazy" />
               <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1.5">
                 {photo.team_name && (
@@ -191,26 +194,28 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
   });
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center animate-backdrop-in" onClick={onClose}>
       {/* Close button */}
       <button onClick={onClose}
-        className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center">
+        className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/15 text-white text-xl font-bold flex items-center justify-center pressable"
+        style={{ transitionTimingFunction: "var(--ease-out)" }}>
         ✕
       </button>
 
       {/* Download button */}
       <div className="absolute top-4 left-4 z-10" onClick={(e) => e.stopPropagation()}>
         <button onClick={downloadPhoto}
-          className="w-8 h-8 rounded-full bg-white/10 text-white/60 text-xs flex items-center justify-center active:scale-90 transition-transform">
+          className="w-8 h-8 rounded-full bg-white/10 text-white/60 text-xs flex items-center justify-center pressable"
+          style={{ transitionTimingFunction: "var(--ease-out)" }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
       </div>
 
-      {/* Photo */}
-      <img src={photo.url} alt="" className="max-w-[90%] max-h-[50vh] object-contain rounded-lg" onClick={onClose} />
+      {/* Photo — cinematic entrance from scale(0.95) */}
+      <img src={photo.url} alt="" className="max-w-[90%] max-h-[50vh] object-contain rounded-lg animate-lightbox-in" onClick={onClose} />
 
       {/* Caption + team */}
-      <div className="text-center mt-3 px-4">
+      <div className="text-center mt-3 px-4 animate-fade-in" style={{ animationDelay: "100ms" }}>
         {photo.team_name && (
           <p className="text-xs text-white/50">{photo.team_name}</p>
         )}
@@ -219,16 +224,20 @@ function PhotoLightbox({ photo, teamName, onClose }: { photo: Photo; teamName: s
         )}
       </div>
 
-      {/* Emoji reactions — centered under photo */}
+      {/* Emoji reactions — staggered entrance */}
       <div className="mt-4 px-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-center gap-2">
-          {grouped.map(({ emoji, count, myTeam }) => (
+          {grouped.map(({ emoji, count, myTeam }, i) => (
             <button key={emoji} onClick={() => addReaction(emoji, teamName)}
-              className={`flex items-center gap-1 px-3 py-2 rounded-2xl text-lg transition-all active:scale-90 ${
+              className={`flex items-center gap-1 px-3 py-2 rounded-2xl text-lg pressable transition-[background-color,box-shadow] duration-200 animate-slide-up ${
                 myTeam
                   ? "bg-[#7A4AED]/30 ring-1 ring-[#7A4AED]"
                   : "bg-white/10"
-              }`}>
+              }`}
+              style={{
+                animationDelay: `${150 + i * 40}ms`,
+                transitionTimingFunction: "var(--ease-out)",
+              }}>
               <span>{emoji}</span>
               {count > 0 && (
                 <span className="text-xs text-white/80 font-semibold">{count}</span>
