@@ -276,7 +276,12 @@ export function MapScreen({ currentTeamId }: Props) {
             <Marker key={loc.id} position={[loc.lat, loc.lng]}>
               <Popup>
                 <strong>{loc.company}</strong><br />
-                {loc.address}
+                {loc.address}<br />
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.address + ", Liege, Belgium")}`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: "11px", color: "#7A4AED" }}>
+                  Ouvrir dans Google Maps
+                </a>
               </Popup>
             </Marker>
           ))}
