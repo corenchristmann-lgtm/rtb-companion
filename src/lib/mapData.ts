@@ -12,7 +12,7 @@ export interface MapLocation {
 
 // All coordinates verified via Nominatim (OpenStreetMap) — April 2026
 export const LOCATIONS: Record<string, MapLocation> = {
-  oprl: { id: "oprl", company: "OPRL (Depart)", lat: 50.64329, lng: 5.57029, address: "Boulevard Piercot, Place de l'Opera", color: "#1A1035" },
+  oprl: { id: "oprl", company: "OPRL (Depart)", lat: 50.63547, lng: 5.57039, address: "Boulevard Piercot", color: "#1A1035" },
   bnp: { id: "bnp", company: "BNP Paribas Fortis", lat: 50.64296, lng: 5.56828, address: "Place Xavier Neujean 2", color: "#00965E" },
   ucm: { id: "ucm", company: "UCM", lat: 50.63844, lng: 5.56765, address: "Boulevard d'Avroy 42", color: "#E30613" },
   we: { id: "we", company: "Wallonie Entreprendre", lat: 50.63801, lng: 5.56918, address: "Avenue Maurice Destenay 13", color: "#F5A623" },

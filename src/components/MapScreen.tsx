@@ -31,6 +31,14 @@ interface TeamPosition {
 const OPRL = LOCATIONS.oprl;
 const GATHERING_TIME = 7 * 3600 + 50 * 60; // 07:50 — rassemblement OPRL
 
+// Small offset per team so dots don't stack on top of each other
+// Arranged in a circle pattern around the center point
+function teamOffset(teamId: number): [number, number] {
+  const angle = ((teamId - 1) / 9) * 2 * Math.PI - Math.PI / 2;
+  const r = 0.00035; // ~35m radius
+  return [Math.sin(angle) * r, Math.cos(angle) * r];
+}
+
 function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number, routes: RoutesMap): TeamPosition {
   const color = TEAM_COLORS[(team.id - 1) % TEAM_COLORS.length];
 
@@ -45,8 +53,9 @@ function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number, routes: Rout
     const departTime = Math.max(GATHERING_TIME, firstStart - 15 * 60);
 
     if (nowSeconds < departTime) {
-      // Still at OPRL
-      return { teamId: team.id, teamName: team.name, color, lat: OPRL.lat, lng: OPRL.lng, status: "Rassemblement OPRL" };
+      // Still at OPRL — offset so dots don't stack
+      const [dLat, dLng] = teamOffset(team.id);
+      return { teamId: team.id, teamName: team.name, color, lat: OPRL.lat + dLat, lng: OPRL.lng + dLng, status: "Rassemblement OPRL" };
     }
 
     // In transit from OPRL to first atelier
@@ -69,9 +78,10 @@ function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number, routes: Rout
     const start = timeToSeconds(slot.start_time);
     const end = timeToSeconds(slot.end_time);
 
-    // During this challenge
+    // During this challenge — offset so teams at same atelier don't overlap
     if (nowSeconds >= start && nowSeconds < end) {
-      return { teamId: team.id, teamName: team.name, color, lat: loc.lat, lng: loc.lng, status: `Chez ${loc.company}` };
+      const [dLat, dLng] = teamOffset(team.id);
+      return { teamId: team.id, teamName: team.name, color, lat: loc.lat + dLat, lng: loc.lng + dLng, status: `Chez ${loc.company}` };
     }
 
     // In transit to next
@@ -104,7 +114,8 @@ function getTeamPosition(team: typeof TEAMS[0], nowSeconds: number, routes: Rout
   const lastSlot = team.schedule[team.schedule.length - 1];
   const lastLocId = ATELIER_TO_LOCATION[lastSlot.atelier_id];
   const lastLoc = LOCATIONS[lastLocId];
-  return { teamId: team.id, teamName: team.name, color, lat: lastLoc.lat, lng: lastLoc.lng, status: "Journee terminee" };
+  const [dLat, dLng] = teamOffset(team.id);
+  return { teamId: team.id, teamName: team.name, color, lat: lastLoc.lat + dLat, lng: lastLoc.lng + dLng, status: "Journee terminee" };
 }
 
 interface Props {
@@ -159,7 +170,8 @@ export function MapScreen({ currentTeamId }: Props) {
     if (!isEventDay) {
       const oprl = LOCATIONS.oprl;
       const pos = TEAMS.map((t) => {
-        return { teamId: t.id, teamName: t.name, color: TEAM_COLORS[(t.id - 1) % TEAM_COLORS.length], lat: oprl.lat, lng: oprl.lng, status: "Depart : OPRL Boulevard Piercot" };
+        const [dLat, dLng] = teamOffset(t.id);
+        return { teamId: t.id, teamName: t.name, color: TEAM_COLORS[(t.id - 1) % TEAM_COLORS.length], lat: oprl.lat + dLat, lng: oprl.lng + dLng, status: "Depart : OPRL Boulevard Piercot" };
       });
       setPositions(pos);
       return;

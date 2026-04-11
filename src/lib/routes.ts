@@ -186,7 +186,7 @@ function getAllRoutePairs(): [string, string][] {
 
 // ── Cache + load ──
 
-const LS_KEY = "rtb-routes-cache-v4";
+const LS_KEY = "rtb-routes-cache-v5";
 
 export type RoutesMap = Record<string, LatLng[]>;
 
