@@ -76,6 +76,12 @@ export function useTimer(challenges: ChallengeInput[]) {
       let status: ChallengeStatusType = "upcoming";
       let remainingSeconds = 0, progressPercent = 0, label = "";
 
+      if (challenges.length === 0) {
+        label = eventDay ? "Sélectionne ton équipe" : (days > 0 ? `J-${days} avant le RTB` : "Le RTB est passé");
+        setState({ currentChallengeIndex: 0, status: "upcoming", remainingSeconds: 0, progressPercent: 0, label, isEventDay: eventDay, daysUntilEvent: days });
+        return;
+      }
+
       if (!eventDay && manualOverride === null) {
         label = days > 0 ? (days === 1 ? "C'est demain !" : `J-${days} avant le RTB`) : "Le RTB est passé";
         setState({ currentChallengeIndex: 0, status: "upcoming", remainingSeconds: 0, progressPercent: 0, label, isEventDay: false, daysUntilEvent: days });
